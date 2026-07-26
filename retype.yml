@@ -1,0 +1,15 @@
+input: docs
+output: .retype
+url: https://vs1-finance.github.io/lending-docs
+
+branding:
+  logo: static/logo.svg
+  logoDark: static/logo-dark.svg
+  logoHeight: 26
+  label: Reference
+
+meta:
+  title: " · XRPL Lending"
+
+footer:
+  copyright: "VS1 Finance · XRP Ledger Foundation reference implementation"

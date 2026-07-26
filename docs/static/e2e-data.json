@@ -1,0 +1,2364 @@
+{
+  "engine": "http://localhost:4000",
+  "started": "2026-07-26T15:31:12.172Z",
+  "finished": "2026-07-26T15:50:02.518Z",
+  "total": 109,
+  "passed": 109,
+  "failed": 0,
+  "txCount": 122,
+  "results": [
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "health returns ok",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "GET /sessions is a list",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "GET unknown session -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "GET unknown session/state -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "GET unknown session/balances -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "GET unknown session/log -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "add: unknown session (bad role) -> 404 [session-first]",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "add: unknown session (valid role) -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "claim: unknown session -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "release: unknown session -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "action: unknown session -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "bots start unknown -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "bots stop unknown -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no session nope",
+      "tx": []
+    },
+    {
+      "group": "A. Routing & validation negatives",
+      "name": "provision permissioned-IOU-core: settled 24 on-ledger steps",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "24 tx",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "get session -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "state has vault+broker+loans keys",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "has credentialIssuer seat (permissioned)",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "has issuer+owner+2 depositors+2 borrowers",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "every seat account funded on-ledger",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "7 accounts",
+      "tx": []
+    },
+    {
+      "group": "B. Permissioned IOU — reads & structure",
+      "name": "credentials all accepted for pooled members",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "accepted,accepted,accepted,accepted",
+      "tx": []
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "alice deposits 2000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "EF6C3FFAEA03EEDB3116F2CA559F89908A3F0674D6BE52A6D38C73F1C8690827",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": "2000",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "amy deposits 3000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "B43030DAC6C30BE354251971F5447A99D18940B5EB8AAA0FDD6234DE73FDC71C",
+          "action": "deposit",
+          "actor": "depositor:1",
+          "amount": "3000",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "alice deposits again 1000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "1B4A1728A4FD0EBDB56E5D7BFC1E3E2A1A1F1EA5D26A6D07048C9CD5021ABC87",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": "1000",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "alice holds vault shares after deposits",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "shares=3000000000",
+      "tx": []
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "alice withdraws 500 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "5A8713105F179D5B4243C3DC5C4DE727FD2F5F1B3D90B6FFB5531E0B2F356800",
+          "action": "withdraw",
+          "actor": "depositor:0",
+          "amount": "500",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "alice overdraw withdraw 9999999 -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecINSUFFICIENT_FUNDS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "74A148EBAE04CF4381D93B5D86AE86740AB756DFEB0D7D1CEA2DD9E07FA4F091",
+          "action": "withdraw",
+          "actor": "depositor:0",
+          "amount": "9999999",
+          "code": "tecINSUFFICIENT_FUNDS"
+        }
+      ]
+    },
+    {
+      "group": "C. Depositor yield & liquidity",
+      "name": "deposit 200000 (> holder's 60000 balance) -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecINSUFFICIENT_FUNDS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "70EDC0C6EDCC421E70EC52F80BFD6997385A09D47178F8EDB62BB709C35CF720",
+          "action": "deposit",
+          "actor": "depositor:1",
+          "amount": "200000",
+          "code": "tecINSUFFICIENT_FUNDS"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "owner deposits cover 1000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "F0D56CEBC49AF63FDA79CA2164D57A734EDAB13856D5109766035FAA58D9809A",
+          "action": "deposit-cover",
+          "actor": "owner:0",
+          "amount": "1000",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "owner raises vault max to 500000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "87D4A93F61A11169B12A85B815742BFCA58C3EAF30C00CABBA0A316731B01F44",
+          "action": "set-vault",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "owner cover 99999 (> owner's 16000) -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecINSUFFICIENT_FUNDS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "BAEE954FA62DA90E5EDB746D7332B0C602E4335A7001E20F26A80D9D237845B0",
+          "action": "deposit-cover",
+          "actor": "owner:0",
+          "amount": "99999",
+          "code": "tecINSUFFICIENT_FUNDS"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "set vault max 100 below current assets -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecLIMIT_EXCEEDED",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "1510577D5FC71131696441281989556E1B4ECE04CC69256707627342B545E0E7",
+          "action": "set-vault",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tecLIMIT_EXCEEDED"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "owner sets vault max 6000 (above current) -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "2BBB22F6E373E15C7C458548ECDFF2677C45A2721A5873C977D83C0049B0638F",
+          "action": "set-vault",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "deposit 5000 exceeding the 6000 cap headroom -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecLIMIT_EXCEEDED",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "9BDF2A3C4A6AC5F24F9286056FCD39E99DAC81C8BF72A88F57A7B8733B3C5CF5",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": "5000",
+          "code": "tecLIMIT_EXCEEDED"
+        }
+      ]
+    },
+    {
+      "group": "D. Owner: cover & vault management",
+      "name": "owner restores vault max 500000 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "53CE1092AB9E57C7AC13AC21E130D994B3161990191D5544D4067B72B75C88A0",
+          "action": "set-vault",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)",
+      "name": "owner originates 1000 loan to bob -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "2B6B813725F05DD904902257884733510FBFC43ABED9448C798237BFE05F3D20",
+          "action": "originate",
+          "actor": "owner:0",
+          "amount": "1000",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)",
+      "name": "loan appears in state with a loanId",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "D0F410866C1923… owed=1000.000951293694",
+      "tx": []
+    },
+    {
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)",
+      "name": "underpay repay '1' (below scheduled minimum) -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecINSUFFICIENT_PAYMENT",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "1BDB229483EA6B520C46576E0887A16A8E0E8EFAED40FBD4DEF5E467E2B93A30",
+          "action": "repay",
+          "actor": "borrower:0",
+          "amount": "1",
+          "code": "tecINSUFFICIENT_PAYMENT"
+        }
+      ]
+    },
+    {
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)",
+      "name": "bob repays loan IN FULL -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "210CE299C23CB3455E0E76542AB6CAAC6F91F6CC3FFA0B3B29B81726EF4658F8",
+          "action": "repay",
+          "actor": "borrower:0",
+          "amount": "1000.000951293694",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)",
+      "name": "loan settled after full repay (principal outstanding 0)",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "outstanding=0",
+      "tx": []
+    },
+    {
+      "group": "F. Loan default path (originate -> delinquency -> owner default)",
+      "name": "owner originates 500 loan to ben (default path) -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "AD6FA9C476ECB786DD080B852C7796F0045BE74938E4866206343AB14045DE9B",
+          "action": "originate",
+          "actor": "owner:0",
+          "amount": "500",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "F. Loan default path (originate -> delinquency -> owner default)",
+      "name": "ben's loan is outstanding",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "outstanding=500",
+      "tx": []
+    },
+    {
+      "group": "F. Loan default path (originate -> delinquency -> owner default)",
+      "name": "default a current (non-delinquent) loan -> tec*",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecTOO_SOON",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "8D0F45064677D88D0768499F7D3778B22275CEFAC565B8704E5C91673A02F01A",
+          "action": "manage-loan",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tecTOO_SOON"
+        }
+      ]
+    },
+    {
+      "group": "F. Loan default path (originate -> delinquency -> owner default)",
+      "name": "loan becomes defaultable after its payment window",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "defaultableNow=true defaulted=false",
+      "tx": []
+    },
+    {
+      "group": "F. Loan default path (originate -> delinquency -> owner default)",
+      "name": "owner defaults the delinquent loan -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "A70853CFC656E5677F76C0A65189D84EEBE7D2223BD75F85514ED8E5BB0C47AD",
+          "action": "manage-loan",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "originate interval < 60 -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "LoanSet: PaymentInterval must be greater than or equal to 60",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "originate missing principal -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter principal",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "originate missing borrower -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter borrower",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "originate to unknown borrower seat -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "session has no seat borrower:99",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "non-owner originate -> 409 [role guard]",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "only the owner seat can originate a loan",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "originate to non-borrower counterparty -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "depositor seat cannot be a loan counterparty",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "bob acts on alice's seat -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "depositor:0 is not held by bob",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "action on nonexistent seat -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "session has no seat depositor:99",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "unknown action verb -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "unknown action transfer",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit missing amount -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter amount",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "withdraw missing amount -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter amount",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "repay missing loanId -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter loanId",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "manage-loan missing loanId -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter loanId",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount 'abc' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount: abc",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '1.2.3' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount: 1.2.3",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '-5' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount: -5",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '0' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount: 0",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '1e5' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount: 1e5",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter amount",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit bad amount '  ' -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "invalid amount:   ",
+      "tx": []
+    },
+    {
+      "group": "G. Loan & action negatives",
+      "name": "deposit ' 5 ' (trimmed) -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "03AD9C4C70964748C9A742C8B569FEB265523F96CFC0C9503DE3E7E3F97E7950",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": " 5 ",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "alice re-claims her own seat (idempotent) -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "other participant claims held seat -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "depositor:0 is already held by another participant",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "release seat not held -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "depositor:0 is not held by mallory",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "claim unknown seat -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no seat depositor:99",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "release unknown seat -> 404",
+      "ok": true,
+      "expected": "HTTP 404",
+      "actual": "HTTP 404",
+      "detail": "no seat depositor:99",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "claim missing participant -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "participant is required",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "release missing participant -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "participant is required",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "one-human-one-seat (prior seat auto-released)",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "solo holds credentialIssuer:0",
+      "tx": []
+    },
+    {
+      "group": "H. Seat lifecycle rules",
+      "name": "provision credentials: settled 24 on-ledger steps",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "24 tx",
+      "tx": []
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "re-issue credential to existing member -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "33EB42B71DF19622877B7D2FCA44A2852A77650063C81AC574BC27F0A57FA23A",
+          "action": "issue-credential",
+          "actor": "issuer:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "issue-credential to unfunded fresh subject -> tec* (tecNO_TARGET)",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecNO_TARGET",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "568F259C1269955684D3A7DEAA52B2E85C900524E274BB7AC0D30A11C7F5F0C8",
+          "action": "issue-credential",
+          "actor": "issuer:0",
+          "amount": "",
+          "code": "tecNO_TARGET"
+        }
+      ]
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "revoke-credential for never-existing subject -> tec* (tecNO_ENTRY)",
+      "ok": true,
+      "expected": "200 + tec*",
+      "actual": "200 tecNO_ENTRY",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "6B316076CF7BB58C499B5BF13E67BF8245EE7A3BF9AA6FA89647F91CFF2CFA11",
+          "action": "revoke-credential",
+          "actor": "issuer:0",
+          "amount": "",
+          "code": "tecNO_ENTRY"
+        }
+      ]
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "revoke-credential for a credentialed member -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "FCF104146E103F2ED87A7BBFE4DB2E411C90B4D54BC27381957032E8E0AC2A10",
+          "action": "revoke-credential",
+          "actor": "issuer:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "re-issue credential to that member -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "38AEA4CEB1A8F94E16904407855BCC14737569EF28E6A5CF0B46A6D065220D2C",
+          "action": "issue-credential",
+          "actor": "issuer:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "issue-credential missing subject -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "missing parameter subject",
+      "tx": []
+    },
+    {
+      "group": "I. Credential handshake (issue / accept / revoke)",
+      "name": "accept-credential by the member -> settles",
+      "ok": true,
+      "expected": "200 + settled code",
+      "actual": "200 tecDUPLICATE",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "10582383DA7B065F56C948AEB0F86CDBCDFD8D718AAB6067E16D96F9BD2D8930",
+          "action": "accept-credential",
+          "actor": "depositor:0",
+          "amount": "",
+          "code": "tecDUPLICATE"
+        }
+      ]
+    },
+    {
+      "group": "J. Permissioned deposit gating & domain",
+      "name": "credentialed depositor deposits 250 -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "B64161E9835EEA1C57D3F275D63818979F43888AACEA7F4CB002F4D2ACF08936",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": "250",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "J. Permissioned deposit gating & domain",
+      "name": "owner set-domain on permissioned vault -> settles",
+      "ok": true,
+      "expected": "200 + settled code",
+      "actual": "200 tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "7D297EF1FE56F1BE0A61DA17E7D95F729C3B9571F45E11CFFCB59F1A901C5EFB",
+          "action": "set-domain",
+          "actor": "owner:0",
+          "amount": "",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "J. Permissioned deposit gating & domain",
+      "name": "provision public: settled 15 on-ledger steps",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "15 tx",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "no credentialIssuer seat (public)",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "state credentials list empty (public)",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "set-domain on public vault -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "this session is a public vault and has no domain to configure",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "issue-credential on public vault -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "this session is a public vault and has no credential scheme",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "revoke-credential on public vault -> 409",
+      "ok": true,
+      "expected": "HTTP 409",
+      "actual": "HTTP 409",
+      "detail": "this session is a public vault and has no credential scheme",
+      "tx": []
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "deposit on public vault (no gate) -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "6838C577A124EBB98F28C1CCA038260398107F485913033AB90718C09B388AF9",
+          "action": "deposit",
+          "actor": "depositor:0",
+          "amount": "400",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "withdraw on public vault -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "C1CB08AD30DAF239B7DE578EF61513575B8B999D76A0AA838203BB686167BFFA",
+          "action": "withdraw",
+          "actor": "depositor:0",
+          "amount": "100",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "originate loan on public vault -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "DBF66E0CF2232FB622BEE04DC094853EA11C9616C944042F56991539D35BC50D",
+          "action": "originate",
+          "actor": "owner:0",
+          "amount": "200",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "repay loan on public vault -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "0D81F8A7C6F2728CD14D23DCA37A78A285396D046682A4AE483A585EC4984E2D",
+          "action": "repay",
+          "actor": "borrower:0",
+          "amount": "200.0001902587388",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "K. Public (non-permissioned) vault",
+      "name": "provision multi-participant: settled 24 on-ledger steps",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "24 tx",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add depositor #1 -> 200 + grew (2->3)",
+      "ok": true,
+      "expected": "3",
+      "actual": "3",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add depositor #2 -> 200 + grew (3->4)",
+      "ok": true,
+      "expected": "4",
+      "actual": "4",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add depositor #3 -> 200 + grew (4->5)",
+      "ok": true,
+      "expected": "5",
+      "actual": "5",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add borrower -> 200 + grew",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "borrowers=3",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add bad role -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "role must be depositor or borrower",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add missing role -> 400",
+      "ok": true,
+      "expected": "HTTP 400",
+      "actual": "HTTP 400",
+      "detail": "role must be depositor or borrower",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "added depositor:4 can deposit -> tesSUCCESS",
+      "ok": true,
+      "expected": "tesSUCCESS",
+      "actual": "tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "74A93C17EC25326C5E27F6090EF7944557B72D8A9B80A8DAAA7C439C12CEE9AA",
+          "action": "deposit",
+          "actor": "depositor:4",
+          "amount": "150",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "depositor:4 funded on-ledger",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "xrp=3.599997",
+      "tx": []
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "originate loan to runtime-added borrower:2 -> settles",
+      "ok": true,
+      "expected": "200 + settled code",
+      "actual": "200 tesSUCCESS",
+      "detail": "",
+      "tx": [
+        {
+          "hash": "0F1EA233ECE3D2D1D084312289716A406167992933432995AA36AB2ACF73C977",
+          "action": "originate",
+          "actor": "owner:0",
+          "amount": "50",
+          "code": "tesSUCCESS"
+        }
+      ]
+    },
+    {
+      "group": "L. Runtime add-participant",
+      "name": "add-participant recorded in the action log",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "system log entry",
+      "tx": []
+    },
+    {
+      "group": "M. Bots driving the pool",
+      "name": "bots start (interval 2s) -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "M. Bots driving the pool",
+      "name": "bots start again (idempotent) -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "M. Bots driving the pool",
+      "name": "bots produced settled on-ledger actions",
+      "ok": true,
+      "expected": "",
+      "actual": "",
+      "detail": "1 new bot tx",
+      "tx": []
+    },
+    {
+      "group": "M. Bots driving the pool",
+      "name": "bots stop -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    },
+    {
+      "group": "M. Bots driving the pool",
+      "name": "bots stop again (no-op) -> 200",
+      "ok": true,
+      "expected": "HTTP 200",
+      "actual": "HTTP 200",
+      "detail": "",
+      "tx": []
+    }
+  ],
+  "transactions": [
+    {
+      "hash": "55AF14DA720E878B4C19CE374A2ADEFB5A939A81924B9D8BC82B256E10CD5E05",
+      "action": "issuer-allow-clawback",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "A23E780AE05D204D29B17ECA0ACBD12331BB650700EBF7D28CF0B547513C5F45",
+      "action": "issuer-default-ripple",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "F479F36356FDAC6052DF3E9F4F114B82131D0C62B6F26C7996AAC4E1113F3C05",
+      "action": "trust-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "4CAF19E19BB122D0AF81509CB5700DB16D5F3504C35D32DCE4E9FE4D421C8E23",
+      "action": "trust-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "5D76F11903DE4163ECBFCAD1BE62AB8F9EF0B32E462DAA7F31FF5E3B1969174A",
+      "action": "trust-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "9419FBC8E4E97264F27C6AAEB52B612257B2A0E04F383585F45F0321F3E47F27",
+      "action": "trust-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "E79AE93DC47916F270121742603390506EF942B593BFB2A8F883E9B4DAA702C3",
+      "action": "trust-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "19628C264AC9CE4F544B352A1B55EFE89F76A7246C9354BBC1BBE12A71602CA3",
+      "action": "distribute-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "B85FAB8D2C3BDF61602F17F01990F18CC0B4E5CDC4780DBA22D950206F4AB4A9",
+      "action": "distribute-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "D780D07A286C49486F45A7A8A51B276184D076865FB5F7E62BFBBA2F517F8661",
+      "action": "distribute-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "ED6120463776E3DBE041DD933D7268514D4650A22746BE73EC2902060168BA59",
+      "action": "distribute-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "AE300C1ED285D93F4E1A6E77814D2CD692D0D161A10F49C74A783C25D48BBF30",
+      "action": "distribute-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "623214DB5EFCE5F919BAE4B072F5BBE493A2C092CD2F447066D7413F64F7872C",
+      "action": "credential-create-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "9C9BB2B352AE0F2A679F4441AF2CBD737FB4788EE8FD09E4E816068D7F47FE04",
+      "action": "credential-create-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "33F95A7EE2AA68E60A8ED12A1B0455013E826F50CCBDA50C8C3342BC3558B945",
+      "action": "credential-create-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "3E62DAF964447520292AC4E77C0B24A7B785B3E9476876BD60B811BC2923E185",
+      "action": "credential-create-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "19870F090F972AC95309AC4B83D8C8490665241FE77AC6F1FD8ADA08E3D1E8CB",
+      "action": "credential-accept-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "F049FBAE0B9010687E00659844D938595EC78AA6D81AF5D0C3F998E561830F6C",
+      "action": "credential-accept-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "27AECC00DF6FF68A5CB05B4D078067B361439D6C3E27FA0588E42F85A796CF45",
+      "action": "credential-accept-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "298A9FE658C73A6885EA6750F66A88EE99C1B3AAD989F6814A6E04491BD3942E",
+      "action": "credential-accept-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "B9C69D2EC706311196C98625984A046D705838FEB15D2CE6B388493CA5E8CC51",
+      "action": "domain-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "AB8563F63AD2F7158DE3651E8C4B9010F1D155CDD486DAAF2457A7C3488BDE0C",
+      "action": "vault-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "2A4636EE7A09555ADD3348482E9C6AC8F1DB309695AD24E8FC233F6C2707A6AD",
+      "action": "broker-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "0AA43EF906B92D9DF6694B7E51796551CE7C3742202F3F38AD98C6E851B4820B",
+      "action": "cover-deposit",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision permissioned-IOU-core",
+      "group": "Provisioning (permissioned-IOU-core)"
+    },
+    {
+      "hash": "EF6C3FFAEA03EEDB3116F2CA559F89908A3F0674D6BE52A6D38C73F1C8690827",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "2000",
+      "code": "tesSUCCESS",
+      "scenario": "alice deposits 2000 -> tesSUCCESS",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "B43030DAC6C30BE354251971F5447A99D18940B5EB8AAA0FDD6234DE73FDC71C",
+      "action": "deposit",
+      "actor": "depositor:1",
+      "amount": "3000",
+      "code": "tesSUCCESS",
+      "scenario": "amy deposits 3000 -> tesSUCCESS",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "1B4A1728A4FD0EBDB56E5D7BFC1E3E2A1A1F1EA5D26A6D07048C9CD5021ABC87",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "1000",
+      "code": "tesSUCCESS",
+      "scenario": "alice deposits again 1000 -> tesSUCCESS",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "5A8713105F179D5B4243C3DC5C4DE727FD2F5F1B3D90B6FFB5531E0B2F356800",
+      "action": "withdraw",
+      "actor": "depositor:0",
+      "amount": "500",
+      "code": "tesSUCCESS",
+      "scenario": "alice withdraws 500 -> tesSUCCESS",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "74A148EBAE04CF4381D93B5D86AE86740AB756DFEB0D7D1CEA2DD9E07FA4F091",
+      "action": "withdraw",
+      "actor": "depositor:0",
+      "amount": "9999999",
+      "code": "tecINSUFFICIENT_FUNDS",
+      "scenario": "alice overdraw withdraw 9999999 -> tec*",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "70EDC0C6EDCC421E70EC52F80BFD6997385A09D47178F8EDB62BB709C35CF720",
+      "action": "deposit",
+      "actor": "depositor:1",
+      "amount": "200000",
+      "code": "tecINSUFFICIENT_FUNDS",
+      "scenario": "deposit 200000 (> holder's 60000 balance) -> tec*",
+      "group": "C. Depositor yield & liquidity"
+    },
+    {
+      "hash": "F0D56CEBC49AF63FDA79CA2164D57A734EDAB13856D5109766035FAA58D9809A",
+      "action": "deposit-cover",
+      "actor": "owner:0",
+      "amount": "1000",
+      "code": "tesSUCCESS",
+      "scenario": "owner deposits cover 1000 -> tesSUCCESS",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "87D4A93F61A11169B12A85B815742BFCA58C3EAF30C00CABBA0A316731B01F44",
+      "action": "set-vault",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "owner raises vault max to 500000 -> tesSUCCESS",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "BAEE954FA62DA90E5EDB746D7332B0C602E4335A7001E20F26A80D9D237845B0",
+      "action": "deposit-cover",
+      "actor": "owner:0",
+      "amount": "99999",
+      "code": "tecINSUFFICIENT_FUNDS",
+      "scenario": "owner cover 99999 (> owner's 16000) -> tec*",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "1510577D5FC71131696441281989556E1B4ECE04CC69256707627342B545E0E7",
+      "action": "set-vault",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tecLIMIT_EXCEEDED",
+      "scenario": "set vault max 100 below current assets -> tec*",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "2BBB22F6E373E15C7C458548ECDFF2677C45A2721A5873C977D83C0049B0638F",
+      "action": "set-vault",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "owner sets vault max 6000 (above current) -> tesSUCCESS",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "9BDF2A3C4A6AC5F24F9286056FCD39E99DAC81C8BF72A88F57A7B8733B3C5CF5",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "5000",
+      "code": "tecLIMIT_EXCEEDED",
+      "scenario": "deposit 5000 exceeding the 6000 cap headroom -> tec*",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "53CE1092AB9E57C7AC13AC21E130D994B3161990191D5544D4067B72B75C88A0",
+      "action": "set-vault",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "owner restores vault max 500000 -> tesSUCCESS",
+      "group": "D. Owner: cover & vault management"
+    },
+    {
+      "hash": "2B6B813725F05DD904902257884733510FBFC43ABED9448C798237BFE05F3D20",
+      "action": "originate",
+      "actor": "owner:0",
+      "amount": "1000",
+      "code": "tesSUCCESS",
+      "scenario": "owner originates 1000 loan to bob -> tesSUCCESS",
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)"
+    },
+    {
+      "hash": "1BDB229483EA6B520C46576E0887A16A8E0E8EFAED40FBD4DEF5E467E2B93A30",
+      "action": "repay",
+      "actor": "borrower:0",
+      "amount": "1",
+      "code": "tecINSUFFICIENT_PAYMENT",
+      "scenario": "underpay repay '1' (below scheduled minimum) -> tec*",
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)"
+    },
+    {
+      "hash": "210CE299C23CB3455E0E76542AB6CAAC6F91F6CC3FFA0B3B29B81726EF4658F8",
+      "action": "repay",
+      "actor": "borrower:0",
+      "amount": "1000.000951293694",
+      "code": "tesSUCCESS",
+      "scenario": "bob repays loan IN FULL -> tesSUCCESS",
+      "group": "E. Full loan lifecycle (originate -> underpay tec -> full repay -> settled)"
+    },
+    {
+      "hash": "AD6FA9C476ECB786DD080B852C7796F0045BE74938E4866206343AB14045DE9B",
+      "action": "originate",
+      "actor": "owner:0",
+      "amount": "500",
+      "code": "tesSUCCESS",
+      "scenario": "owner originates 500 loan to ben (default path) -> tesSUCCESS",
+      "group": "F. Loan default path (originate -> delinquency -> owner default)"
+    },
+    {
+      "hash": "8D0F45064677D88D0768499F7D3778B22275CEFAC565B8704E5C91673A02F01A",
+      "action": "manage-loan",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tecTOO_SOON",
+      "scenario": "default a current (non-delinquent) loan -> tec*",
+      "group": "F. Loan default path (originate -> delinquency -> owner default)"
+    },
+    {
+      "hash": "A70853CFC656E5677F76C0A65189D84EEBE7D2223BD75F85514ED8E5BB0C47AD",
+      "action": "manage-loan",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "owner defaults the delinquent loan -> tesSUCCESS",
+      "group": "F. Loan default path (originate -> delinquency -> owner default)"
+    },
+    {
+      "hash": "03AD9C4C70964748C9A742C8B569FEB265523F96CFC0C9503DE3E7E3F97E7950",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": " 5 ",
+      "code": "tesSUCCESS",
+      "scenario": "deposit ' 5 ' (trimmed) -> tesSUCCESS",
+      "group": "G. Loan & action negatives"
+    },
+    {
+      "hash": "2CBDF1CD3AF8E7FF2AC7D20395F936CA1AD0C04B62D0C130A1546009CF345BB0",
+      "action": "issuer-allow-clawback",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "4D6B8DD3BEC8E3A265CDA461DF6A3C857A96ABAA075B6E603CF7BDE58879B7C7",
+      "action": "issuer-default-ripple",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "14DF5D4AD307FA0CB3D70033848E2D93FF9029F49C78CDC6B3125EF7EDBAF280",
+      "action": "trust-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "98FFEBA63C0AF2E00E66031E6942A731C6693B7D527BFB47DEB9FB2883CF32BE",
+      "action": "trust-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "ED31544A14DF42C4B95456F2AC23FAC62BD0B407F7937B10343FF6F4E2D106EF",
+      "action": "trust-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "68A16A551DA30852452E16B1030F7F7F5E347407A530D9F9CB3A9B62834CB98D",
+      "action": "trust-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "D9F1F17490DD2124511A1AEF0D99937ABC114B96F8A871992E9AA67D50F0F616",
+      "action": "trust-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "54EAE521E2A09A57631ACB481C3C696D3CAC0CCCA8655B67444773EB95F36ED1",
+      "action": "distribute-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "243121787037920A642426A1EDF4501B1E43E0BAA83908AF8C5F7F8CF49E5844",
+      "action": "distribute-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "5534E8F528258CF9F617D00CC2872B6CC1F0A6DF724974F4D98A022852FBCDFE",
+      "action": "distribute-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "BB12025051702C1F056C67ED04122444AF17EDC7360CCC1647F41880D3BF307A",
+      "action": "distribute-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "CE0B4FE4643636E0C6DFE9A4C7835F2F7568E071BB33B8B283A16E73409347F5",
+      "action": "distribute-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "4F4AB2DE40140BBFF86EE8A1CA786E878BD8BD8D740E362E3BEB73CC0A37D35B",
+      "action": "credential-create-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "BFE76343D4EAC785CB4E057C17D41BA9377D9C88903CAF265C256B80CC256942",
+      "action": "credential-create-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "E90C154E95D3078E375F1F0604C94B8E8D6EF055711DE0F5E93824060D33A896",
+      "action": "credential-create-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "8C5C59B716E1DCCE0EF5F4038F478D100B29AB41B47E91903F6354EAF7781F7B",
+      "action": "credential-create-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "AE25BB32099C80267FB3C68BE08B9948A4A72F87F96B81A3F47D73FFA401AAB1",
+      "action": "credential-accept-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "D75288FE3AFB8AC3627211555F0E21C7A783395361B19933DF77C66F4537CFD6",
+      "action": "credential-accept-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "C7428C413738E364EC5D027D43D4A64B64FC130D4088AB421D4C8D1C4F22C7A2",
+      "action": "credential-accept-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "24385BBD226A6F171917154B0B476F901F16DA0625882C459FA6A07F96FB2336",
+      "action": "credential-accept-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "0A60503FAF5DCC6E4F9D444DA5A533CC8032FCECFF2863932EED5763E04D6F51",
+      "action": "domain-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "4A01DC0BE5206F60DAE5B906E88E3A9396BBA5535DD14D16C0E5AA79B25D2A53",
+      "action": "vault-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "5C5A68B0BF4B4C0A257CD97F7066717CFCA1E91316A55639F3EC05EDDC003606",
+      "action": "broker-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "0C90663C99845D7D5CF0711346B2CC26BB8C52CA8064E8C99E9B4145AEFE545C",
+      "action": "cover-deposit",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision credentials",
+      "group": "Provisioning (credentials)"
+    },
+    {
+      "hash": "33EB42B71DF19622877B7D2FCA44A2852A77650063C81AC574BC27F0A57FA23A",
+      "action": "issue-credential",
+      "actor": "issuer:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "re-issue credential to existing member -> tesSUCCESS",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "568F259C1269955684D3A7DEAA52B2E85C900524E274BB7AC0D30A11C7F5F0C8",
+      "action": "issue-credential",
+      "actor": "issuer:0",
+      "amount": "",
+      "code": "tecNO_TARGET",
+      "scenario": "issue-credential to unfunded fresh subject -> tec* (tecNO_TARGET)",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "6B316076CF7BB58C499B5BF13E67BF8245EE7A3BF9AA6FA89647F91CFF2CFA11",
+      "action": "revoke-credential",
+      "actor": "issuer:0",
+      "amount": "",
+      "code": "tecNO_ENTRY",
+      "scenario": "revoke-credential for never-existing subject -> tec* (tecNO_ENTRY)",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "FCF104146E103F2ED87A7BBFE4DB2E411C90B4D54BC27381957032E8E0AC2A10",
+      "action": "revoke-credential",
+      "actor": "issuer:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "revoke-credential for a credentialed member -> tesSUCCESS",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "38AEA4CEB1A8F94E16904407855BCC14737569EF28E6A5CF0B46A6D065220D2C",
+      "action": "issue-credential",
+      "actor": "issuer:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "re-issue credential to that member -> tesSUCCESS",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "10582383DA7B065F56C948AEB0F86CDBCDFD8D718AAB6067E16D96F9BD2D8930",
+      "action": "accept-credential",
+      "actor": "depositor:0",
+      "amount": "",
+      "code": "tecDUPLICATE",
+      "scenario": "accept-credential by the member -> settles",
+      "group": "I. Credential handshake (issue / accept / revoke)"
+    },
+    {
+      "hash": "B64161E9835EEA1C57D3F275D63818979F43888AACEA7F4CB002F4D2ACF08936",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "250",
+      "code": "tesSUCCESS",
+      "scenario": "credentialed depositor deposits 250 -> tesSUCCESS",
+      "group": "J. Permissioned deposit gating & domain"
+    },
+    {
+      "hash": "7D297EF1FE56F1BE0A61DA17E7D95F729C3B9571F45E11CFFCB59F1A901C5EFB",
+      "action": "set-domain",
+      "actor": "owner:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "owner set-domain on permissioned vault -> settles",
+      "group": "J. Permissioned deposit gating & domain"
+    },
+    {
+      "hash": "E4BD2752302053F6EFB1A85CFCEDF130B63099EEA51F40BC9C89C4EEAE1758D6",
+      "action": "issuer-allow-clawback",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "B735203A1E93FD8FBB3698D173470D66C1F2CAEBF5D6B49FF7BB288D3918F926",
+      "action": "issuer-default-ripple",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "9872D2C5520DDD970E6283041BFBEAA949E753182C241D18F0AF0B5C1C50C5BC",
+      "action": "trust-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "8213D6E6E51C77E7CB097EC41E7EBE35F4DAC069F524326FF14B1352DB7DA2BF",
+      "action": "trust-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "09C386093ED3BBA551C5AF3DEE78AE18A713B8C3ED5E6B5D7A06B2A8B5538F3F",
+      "action": "trust-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "984156BF1724C85E94182BC55AE9C550EAF73E3899C5648B2DE8F84C74A48F8D",
+      "action": "trust-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "12EC7FE19A27C101BDBB4A34111AEC784014F679ADBC457281D899EDB59A0ABE",
+      "action": "trust-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "34C80A40A424F57222DFAB5DE4D00064592DACF2AF9C329C2E711A6923A61C0F",
+      "action": "distribute-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "4BD6AEBD833ADF38F49611242808E287C1D4BA7325A22FCF3F295065886D00FD",
+      "action": "distribute-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "FFF092DEEB10E74A465412FA5E002D913ACCD9905C4FFF1C817D7FA93A2E28D5",
+      "action": "distribute-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "2BE2835A3917D31FECBD73B4AC8A79FCFF933996A7802F682AE687E44C6251EF",
+      "action": "distribute-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "6BA3818B94B05F6B594133C8AB4B16B4C66D3F7248CE594916983B9B81C040C5",
+      "action": "distribute-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "B1458246A0DDDD4CA6999598E3DE8A3AA0F69D551CAB16C310B99E671BEEAE87",
+      "action": "vault-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "FDCF2B356EEA0BE09AE54F02CCEE71AA0F0AB8A86E45A0A87B5C3E3BF2F6D78F",
+      "action": "broker-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "876A40BA972268F9AC035E1E12882E60F8D687D21F41EDBE2E6686CE042A0158",
+      "action": "cover-deposit",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision public",
+      "group": "Provisioning (public)"
+    },
+    {
+      "hash": "6838C577A124EBB98F28C1CCA038260398107F485913033AB90718C09B388AF9",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "400",
+      "code": "tesSUCCESS",
+      "scenario": "deposit on public vault (no gate) -> tesSUCCESS",
+      "group": "K. Public (non-permissioned) vault"
+    },
+    {
+      "hash": "C1CB08AD30DAF239B7DE578EF61513575B8B999D76A0AA838203BB686167BFFA",
+      "action": "withdraw",
+      "actor": "depositor:0",
+      "amount": "100",
+      "code": "tesSUCCESS",
+      "scenario": "withdraw on public vault -> tesSUCCESS",
+      "group": "K. Public (non-permissioned) vault"
+    },
+    {
+      "hash": "DBF66E0CF2232FB622BEE04DC094853EA11C9616C944042F56991539D35BC50D",
+      "action": "originate",
+      "actor": "owner:0",
+      "amount": "200",
+      "code": "tesSUCCESS",
+      "scenario": "originate loan on public vault -> tesSUCCESS",
+      "group": "K. Public (non-permissioned) vault"
+    },
+    {
+      "hash": "0D81F8A7C6F2728CD14D23DCA37A78A285396D046682A4AE483A585EC4984E2D",
+      "action": "repay",
+      "actor": "borrower:0",
+      "amount": "200.0001902587388",
+      "code": "tesSUCCESS",
+      "scenario": "repay loan on public vault -> tesSUCCESS",
+      "group": "K. Public (non-permissioned) vault"
+    },
+    {
+      "hash": "8742BD72A17D688AEC723C57F65C2953935AC1F1DBC5798D18DAA25D10A29A00",
+      "action": "issuer-allow-clawback",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "A0B7BCBA0B2CBC9629B93D58D0CA306F6F963377D83B4A202F06AA64D8D70625",
+      "action": "issuer-default-ripple",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "B6DBCE98247F5B52343D57D6288E6A5C42CE114654A40822F6F4959ABF9D6432",
+      "action": "trust-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "2F92A3A6435E1C4D25119F0AA19C1F405B4D69EB3C46A7EF370378B501856443",
+      "action": "trust-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "4E708E88B632C876C84A83F8BF40181FCFCB3FE6F0EFE85624336A3A1B21BACF",
+      "action": "trust-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "DA4E969EFF11EC48A4CAAF4F4A0CB127F0D35E181FB1B3A796559114FCB9652C",
+      "action": "trust-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "DA2F9CAE0F174C65559BBE5E494D32949BB37E53EF55487F96F6DFDDF85F02AC",
+      "action": "trust-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "AE02175E8ABEF1FA744BEA2692F3573A174D702B6B6158CE06031F7A246F82F6",
+      "action": "distribute-owner",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "B63D78E17B54D9EB237ED2FA07261AE7CAB53E6B02AEB1E29EB2B094D33AA183",
+      "action": "distribute-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "0042001388172FBB17157F737D58B45F1A884637293C4636242BEB5DE1B9A3EE",
+      "action": "distribute-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "361A6338C6798DC92EC895EAEABE0EFE4C5D940732AC7AD6884EE62A3B61BAD2",
+      "action": "distribute-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "B6B6B375F8501095FF9BFC76930B00F25A2F608D1483F10B670FCFD2E59CD647",
+      "action": "distribute-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "3FD24A889FB66A3FB705AAF5FCB123CCC421D24708302B45FC3FE8F15DCF884D",
+      "action": "credential-create-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "1E18F5E050215FBB47CC9E9B840B9669E22D5952BA08104D845110957124C6EE",
+      "action": "credential-create-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "7A730AF32B2ABEB5EB4A1B55D3642128069370FB5C3B0E3C94CED2EC6AD46517",
+      "action": "credential-create-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "A09388332C465ADCE6CE2EE36CA940E17D126D3C508E82D59D0FF01FBBB7DAC4",
+      "action": "credential-create-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "14730D742693DDD1B01B8634433BDE1ACFE8652B407CD5D544DBC9D0EFD3806E",
+      "action": "credential-accept-depositor[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "98DA542AB76F95BC89B83888482D10F97E79D55ACB335DA837DAED77044AF593",
+      "action": "credential-accept-depositor[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "92DFB77FC63095FB76718C268D48CC18D15E99CA1948AD260A0D56A9B60476F8",
+      "action": "credential-accept-borrower[0]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "6C41C0F0E197B0B09BB9EE54C4565AC0E186C4799F485B27CC39238CCD407E4D",
+      "action": "credential-accept-borrower[1]",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "9FF9DF93A1E6899F1800005A3A82D569AAA781167A0D574BA274B81CBA2114FB",
+      "action": "domain-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "F438FE7CAAC81DA9B563B6969A46DD3938EB45B965389B6B12F97A6B54A7984B",
+      "action": "vault-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "FD90C2E0759149455B731177023BF14461838B9C9387BEE7EEF0943D188A3785",
+      "action": "broker-create",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "07EA5508431A3E7F864D284331E3DD04E3470993A078AF0AAEC607A7BC1B1611",
+      "action": "cover-deposit",
+      "actor": "system",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "provision multi-participant",
+      "group": "Provisioning (multi-participant)"
+    },
+    {
+      "hash": "74A93C17EC25326C5E27F6090EF7944557B72D8A9B80A8DAAA7C439C12CEE9AA",
+      "action": "deposit",
+      "actor": "depositor:4",
+      "amount": "150",
+      "code": "tesSUCCESS",
+      "scenario": "added depositor:4 can deposit -> tesSUCCESS",
+      "group": "L. Runtime add-participant"
+    },
+    {
+      "hash": "0F1EA233ECE3D2D1D084312289716A406167992933432995AA36AB2ACF73C977",
+      "action": "originate",
+      "actor": "owner:0",
+      "amount": "50",
+      "code": "tesSUCCESS",
+      "scenario": "originate loan to runtime-added borrower:2 -> settles",
+      "group": "L. Runtime add-participant"
+    },
+    {
+      "hash": "EA460AECCF6128A11F0D04A5AEA01447D7A8F54BE900ABE9A1C7F01F1AC2D597",
+      "action": "deposit",
+      "actor": "depositor:0",
+      "amount": "",
+      "code": "tesSUCCESS",
+      "scenario": "bots driving pool",
+      "group": "M. Bots driving the pool"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "xrpl-lending-docs",
+  "private": true,
+  "scripts": {
+    "start": "retype start",
+    "build": "retype build"
+  },
+  "devDependencies": {
+    "retypeapp": "^3"
+  }
+}

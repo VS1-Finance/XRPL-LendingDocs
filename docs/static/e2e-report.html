@@ -1,0 +1,1427 @@
+<title>XRPL Lending Engine — Ledger-Proof Test Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --ground:#fbfcfd; --surface:#f1f5f9; --surface-2:#e7edf3; --line:#d8e0e8; --line-soft:#e6ecf2;
+  --ink:#141a22; --ink-2:#48525e; --muted:#7a8894;
+  --accent:#1f6feb; --accent-soft:#dbe8fd;
+  --tes:#1a7f37; --tes-bg:#e6f4ea; --tec:#9a6700; --tec-bg:#faf0d6; --bad:#cf222e; --bad-bg:#ffe9e9;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root{
+  --ground:#0b0f14; --surface:#11161d; --surface-2:#161d26; --line:#232c38; --line-soft:#1a212b;
+  --ink:#e6edf4; --ink-2:#aeb9c6; --muted:#6e7b8a;
+  --accent:#4d9bff; --accent-soft:#12233d;
+  --tes:#46c265; --tes-bg:#0f2417; --tec:#e3b341; --tec-bg:#241d0c; --bad:#ff6a6a; --bad-bg:#2a1416;
+}}
+:root[data-theme="light"]{
+  --ground:#fbfcfd; --surface:#f1f5f9; --surface-2:#e7edf3; --line:#d8e0e8; --line-soft:#e6ecf2;
+  --ink:#141a22; --ink-2:#48525e; --muted:#7a8894; --accent:#1f6feb; --accent-soft:#dbe8fd;
+  --tes:#1a7f37; --tes-bg:#e6f4ea; --tec:#9a6700; --tec-bg:#faf0d6; --bad:#cf222e; --bad-bg:#ffe9e9;
+}
+:root[data-theme="dark"]{
+  --ground:#0b0f14; --surface:#11161d; --surface-2:#161d26; --line:#232c38; --line-soft:#1a212b;
+  --ink:#e6edf4; --ink-2:#aeb9c6; --muted:#6e7b8a; --accent:#4d9bff; --accent-soft:#12233d;
+  --tes:#46c265; --tes-bg:#0f2417; --tec:#e3b341; --tec-bg:#241d0c; --bad:#ff6a6a; --bad-bg:#2a1416;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(1.5rem,4vw,3.5rem) clamp(1rem,4vw,2rem) 5rem}
+
+/* Masthead */
+.mast{border-bottom:1px solid var(--line);padding-bottom:1.75rem;margin-bottom:2rem}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 .7rem;font-weight:600}
+h1{font-size:clamp(1.6rem,4.5vw,2.5rem);line-height:1.08;margin:0 0 .6rem;font-weight:680;letter-spacing:-.02em;text-wrap:balance;max-width:20ch}
+.lede{color:var(--ink-2);margin:0;max-width:64ch;font-size:1.02rem}
+.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;margin-top:1.15rem;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.meta b{color:var(--ink-2);font-weight:600}
+
+/* Metrics band */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;margin:0 0 1.5rem}
+.metric{background:var(--surface);padding:1.15rem 1.25rem}
+.metric .n{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.metric .l{font-family:var(--mono);font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:.5rem}
+.metric.pass .n{color:var(--tes)} .metric.proof .n{color:var(--accent)}
+.metric .sub{font-size:.74rem;color:var(--ink-2);margin-top:.15rem}
+@media(max-width:640px){.metrics{grid-template-columns:repeat(2,1fr)}}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:0 0 2.5rem;padding:.9rem 1.1rem;
+  background:var(--surface);border:1px solid var(--line-soft);border-radius:12px}
+.legend .lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:.4rem}
+.leg{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.78rem;color:var(--ink-2)}
+.leg .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.leg.tes .dot{background:var(--tes)} .leg.tec .dot{background:var(--tec)}
+.leg .n{color:var(--muted);font-size:.72rem}
+
+/* Group sections */
+.grp{margin:0 0 1.6rem;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.grp-h{display:flex;align-items:baseline;gap:.85rem;padding:.95rem 1.2rem;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.grp-code{font-family:var(--mono);font-weight:700;font-size:.9rem;color:var(--accent);letter-spacing:.02em}
+.grp-h h2{font-size:.98rem;font-weight:620;margin:0;flex:1;letter-spacing:-.01em}
+.grp-stat{font-family:var(--mono);font-size:.8rem;font-weight:600;padding:.15rem .55rem;border-radius:20px}
+.grp-stat.all{color:var(--tes);background:var(--tes-bg)} .grp-stat.some{color:var(--tec);background:var(--tec-bg)}
+
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.c-state{width:34px} .c-out{width:1%;white-space:nowrap} .c-proof{width:1%;white-space:nowrap}
+.tbl td{padding:.5rem .7rem;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.ok:hover,.tbl tr.bad:hover{background:var(--surface-2)}
+td.state{text-align:center} .glyph{font-weight:700;font-size:.85rem}
+tr.ok .glyph{color:var(--tes)} tr.bad .glyph{color:var(--bad)}
+td.name{color:var(--ink);font-weight:450} tr.bad td.name{color:var(--bad);font-weight:600}
+.chip{font-family:var(--mono);font-size:.72rem;font-weight:600;padding:.13rem .5rem;border-radius:6px;white-space:nowrap;letter-spacing:.01em}
+.chip.tes{color:var(--tes);background:var(--tes-bg)} .chip.tec{color:var(--tec);background:var(--tec-bg)}
+.verdict{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}
+.hash{font-family:var(--mono);font-size:.74rem;color:var(--accent);text-decoration:none;white-space:nowrap;
+  background:var(--accent-soft);padding:.12rem .45rem;border-radius:6px;transition:background .12s}
+.hash span{font-weight:600} .hash:hover{background:var(--accent);color:#fff}
+.muted{color:var(--muted)}
+
+/* Proof ledger */
+details.ledger{margin-top:2.5rem;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+details.ledger>summary{cursor:pointer;list-style:none;padding:1.05rem 1.2rem;font-weight:620;font-size:1rem;
+  display:flex;align-items:center;gap:.6rem;background:var(--surface-2)}
+details.ledger>summary::-webkit-details-marker{display:none}
+details.ledger>summary::before{content:"▸";color:var(--accent);font-size:.8rem;transition:transform .15s}
+details.ledger[open]>summary::before{transform:rotate(90deg)}
+details.ledger>summary .c{font-family:var(--mono);font-size:.78rem;color:var(--muted);font-weight:500;margin-left:auto}
+.ptbl{width:100%;border-collapse:collapse;font-size:13px}
+.ptbl th{text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;padding:.6rem .8rem;border-bottom:1px solid var(--line)}
+.ptbl td{padding:.45rem .8rem;border-bottom:1px solid var(--line-soft)}
+.ptbl tr:last-child td{border-bottom:0}
+.p-grp{color:var(--ink-2)} .p-act code{font-family:var(--mono);font-size:.76rem;color:var(--ink)}
+footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--muted);
+  font-family:var(--mono);font-size:.74rem;line-height:1.7}
+footer a{color:var(--accent);text-decoration:none} footer a:hover{text-decoration:underline}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <div class="mast">
+    <p class="eyebrow">XRP Ledger · Devnet · End-to-End Verification</p>
+    <h1>Permissioned Lending Engine — Ledger-Proof Test Report</h1>
+    <p class="lede">Every scenario below was executed against the live engine and the XRP Ledger Devnet. Each settled action links to its transaction on the public explorer, so every claim of success is verifiable on-chain — not asserted, proven.</p>
+    <div class="meta">
+      <span><b>109</b> scenarios</span>
+      <span><b>122</b> on-ledger transactions</span>
+      <span><b>18m 50s</b> run time</span>
+      <span>2026-07-26 15:31 UTC</span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="n">109</div><div class="l">Scenarios</div><div class="sub">across 13 suites</div></div>
+    <div class="metric pass"><div class="n">109</div><div class="l">Passed</div><div class="sub">zero failures</div></div>
+    <div class="metric proof"><div class="n">122</div><div class="l">Ledger proofs</div><div class="sub">settled on Devnet</div></div>
+    <div class="metric"><div class="n">8</div><div class="l">Result codes</div><div class="sub">tes + tec paths</div></div>
+  </div>
+
+  <div class="legend"><span class="lbl">Ledger results</span><span class="leg tes"><span class="dot"></span>tesSUCCESS<span class="n">112</span></span><span class="leg tec"><span class="dot"></span>tecDUPLICATE<span class="n">1</span></span><span class="leg tec"><span class="dot"></span>tecINSUFFICIENT_FUNDS<span class="n">3</span></span><span class="leg tec"><span class="dot"></span>tecINSUFFICIENT_PAYMENT<span class="n">1</span></span><span class="leg tec"><span class="dot"></span>tecLIMIT_EXCEEDED<span class="n">2</span></span><span class="leg tec"><span class="dot"></span>tecNO_ENTRY<span class="n">1</span></span><span class="leg tec"><span class="dot"></span>tecNO_TARGET<span class="n">1</span></span><span class="leg tec"><span class="dot"></span>tecTOO_SOON<span class="n">1</span></span></div>
+
+  <section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">A</span>
+      <h2>Routing &amp; validation negatives</h2>
+      <span class="grp-stat all">14/14</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">health returns ok</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">GET /sessions is a list</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">GET unknown session -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">GET unknown session/state -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">GET unknown session/balances -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">GET unknown session/log -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add: unknown session (bad role) -&gt; 404 [session-first]</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add: unknown session (valid role) -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">claim: unknown session -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">release: unknown session -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">action: unknown session -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots start unknown -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots stop unknown -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">provision permissioned-IOU-core: settled 24 on-ledger steps</td>
+    <td class="out"><span class="verdict">24 tx</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">B</span>
+      <h2>Permissioned IOU — reads &amp; structure</h2>
+      <span class="grp-stat all">6/6</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">get session -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">state has vault+broker+loans keys</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">has credentialIssuer seat (permissioned)</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">has issuer+owner+2 depositors+2 borrowers</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">every seat account funded on-ledger</td>
+    <td class="out"><span class="verdict">7 accounts</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">credentials all accepted for pooled members</td>
+    <td class="out"><span class="verdict">accepted,accepted,accepted,accepted</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">C</span>
+      <h2>Depositor yield &amp; liquidity</h2>
+      <span class="grp-stat all">7/7</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice deposits 2000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/EF6C3FFAEA03EEDB3116F2CA559F89908A3F0674D6BE52A6D38C73F1C8690827" target="_blank" rel="noreferrer"><span>EF6C3FFA</span>…690827</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">amy deposits 3000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/B43030DAC6C30BE354251971F5447A99D18940B5EB8AAA0FDD6234DE73FDC71C" target="_blank" rel="noreferrer"><span>B43030DA</span>…FDC71C</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice deposits again 1000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/1B4A1728A4FD0EBDB56E5D7BFC1E3E2A1A1F1EA5D26A6D07048C9CD5021ABC87" target="_blank" rel="noreferrer"><span>1B4A1728</span>…1ABC87</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice holds vault shares after deposits</td>
+    <td class="out"><span class="verdict">shares=3000000000</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice withdraws 500 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/5A8713105F179D5B4243C3DC5C4DE727FD2F5F1B3D90B6FFB5531E0B2F356800" target="_blank" rel="noreferrer"><span>5A871310</span>…356800</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice overdraw withdraw 9999999 -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecINSUFFICIENT_FUNDS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/74A148EBAE04CF4381D93B5D86AE86740AB756DFEB0D7D1CEA2DD9E07FA4F091" target="_blank" rel="noreferrer"><span>74A148EB</span>…A4F091</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit 200000 (&gt; holder's 60000 balance) -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecINSUFFICIENT_FUNDS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/70EDC0C6EDCC421E70EC52F80BFD6997385A09D47178F8EDB62BB709C35CF720" target="_blank" rel="noreferrer"><span>70EDC0C6</span>…5CF720</a></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">D</span>
+      <h2>Owner: cover &amp; vault management</h2>
+      <span class="grp-stat all">7/7</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner deposits cover 1000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/F0D56CEBC49AF63FDA79CA2164D57A734EDAB13856D5109766035FAA58D9809A" target="_blank" rel="noreferrer"><span>F0D56CEB</span>…D9809A</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner raises vault max to 500000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/87D4A93F61A11169B12A85B815742BFCA58C3EAF30C00CABBA0A316731B01F44" target="_blank" rel="noreferrer"><span>87D4A93F</span>…B01F44</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner cover 99999 (&gt; owner's 16000) -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecINSUFFICIENT_FUNDS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/BAEE954FA62DA90E5EDB746D7332B0C602E4335A7001E20F26A80D9D237845B0" target="_blank" rel="noreferrer"><span>BAEE954F</span>…7845B0</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">set vault max 100 below current assets -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecLIMIT_EXCEEDED</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/1510577D5FC71131696441281989556E1B4ECE04CC69256707627342B545E0E7" target="_blank" rel="noreferrer"><span>1510577D</span>…45E0E7</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner sets vault max 6000 (above current) -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/2BBB22F6E373E15C7C458548ECDFF2677C45A2721A5873C977D83C0049B0638F" target="_blank" rel="noreferrer"><span>2BBB22F6</span>…B0638F</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit 5000 exceeding the 6000 cap headroom -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecLIMIT_EXCEEDED</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/9BDF2A3C4A6AC5F24F9286056FCD39E99DAC81C8BF72A88F57A7B8733B3C5CF5" target="_blank" rel="noreferrer"><span>9BDF2A3C</span>…3C5CF5</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner restores vault max 500000 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/53CE1092AB9E57C7AC13AC21E130D994B3161990191D5544D4067B72B75C88A0" target="_blank" rel="noreferrer"><span>53CE1092</span>…5C88A0</a></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">E</span>
+      <h2>Full loan lifecycle (originate -&gt; underpay tec -&gt; full repay -&gt; settled)</h2>
+      <span class="grp-stat all">5/5</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner originates 1000 loan to bob -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/2B6B813725F05DD904902257884733510FBFC43ABED9448C798237BFE05F3D20" target="_blank" rel="noreferrer"><span>2B6B8137</span>…5F3D20</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">loan appears in state with a loanId</td>
+    <td class="out"><span class="verdict">D0F410866C1923… owed=1000.000951293694</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">underpay repay '1' (below scheduled minimum) -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecINSUFFICIENT_PAYMENT</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/1BDB229483EA6B520C46576E0887A16A8E0E8EFAED40FBD4DEF5E467E2B93A30" target="_blank" rel="noreferrer"><span>1BDB2294</span>…B93A30</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bob repays loan IN FULL -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/210CE299C23CB3455E0E76542AB6CAAC6F91F6CC3FFA0B3B29B81726EF4658F8" target="_blank" rel="noreferrer"><span>210CE299</span>…4658F8</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">loan settled after full repay (principal outstanding 0)</td>
+    <td class="out"><span class="verdict">outstanding=0</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">F</span>
+      <h2>Loan default path (originate -&gt; delinquency -&gt; owner default)</h2>
+      <span class="grp-stat all">5/5</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner originates 500 loan to ben (default path) -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/AD6FA9C476ECB786DD080B852C7796F0045BE74938E4866206343AB14045DE9B" target="_blank" rel="noreferrer"><span>AD6FA9C4</span>…45DE9B</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">ben's loan is outstanding</td>
+    <td class="out"><span class="verdict">outstanding=500</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">default a current (non-delinquent) loan -&gt; tec*</td>
+    <td class="out"><span class="verdict">200 tecTOO_SOON</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/8D0F45064677D88D0768499F7D3778B22275CEFAC565B8704E5C91673A02F01A" target="_blank" rel="noreferrer"><span>8D0F4506</span>…02F01A</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">loan becomes defaultable after its payment window</td>
+    <td class="out"><span class="verdict">defaultableNow=true defaulted=false</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner defaults the delinquent loan -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/A70853CFC656E5677F76C0A65189D84EEBE7D2223BD75F85514ED8E5BB0C47AD" target="_blank" rel="noreferrer"><span>A70853CF</span>…0C47AD</a></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">G</span>
+      <h2>Loan &amp; action negatives</h2>
+      <span class="grp-stat all">21/21</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate interval &lt; 60 -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate missing principal -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate missing borrower -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate to unknown borrower seat -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">non-owner originate -&gt; 409 [role guard]</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate to non-borrower counterparty -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bob acts on alice's seat -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">action on nonexistent seat -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">unknown action verb -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit missing amount -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">withdraw missing amount -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">repay missing loanId -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">manage-loan missing loanId -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount 'abc' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '1.2.3' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '-5' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '0' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '1e5' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit bad amount '  ' -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit ' 5 ' (trimmed) -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/03AD9C4C70964748C9A742C8B569FEB265523F96CFC0C9503DE3E7E3F97E7950" target="_blank" rel="noreferrer"><span>03AD9C4C</span>…7E7950</a></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">H</span>
+      <h2>Seat lifecycle rules</h2>
+      <span class="grp-stat all">9/9</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">alice re-claims her own seat (idempotent) -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">other participant claims held seat -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">release seat not held -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">claim unknown seat -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">release unknown seat -&gt; 404</td>
+    <td class="out"><span class="verdict">HTTP 404</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">claim missing participant -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">release missing participant -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">one-human-one-seat (prior seat auto-released)</td>
+    <td class="out"><span class="verdict">solo holds credentialIssuer:0</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">provision credentials: settled 24 on-ledger steps</td>
+    <td class="out"><span class="verdict">24 tx</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">I</span>
+      <h2>Credential handshake (issue / accept / revoke)</h2>
+      <span class="grp-stat all">7/7</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">re-issue credential to existing member -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/33EB42B71DF19622877B7D2FCA44A2852A77650063C81AC574BC27F0A57FA23A" target="_blank" rel="noreferrer"><span>33EB42B7</span>…7FA23A</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">issue-credential to unfunded fresh subject -&gt; tec* (tecNO_TARGET)</td>
+    <td class="out"><span class="verdict">200 tecNO_TARGET</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/568F259C1269955684D3A7DEAA52B2E85C900524E274BB7AC0D30A11C7F5F0C8" target="_blank" rel="noreferrer"><span>568F259C</span>…F5F0C8</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">revoke-credential for never-existing subject -&gt; tec* (tecNO_ENTRY)</td>
+    <td class="out"><span class="verdict">200 tecNO_ENTRY</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/6B316076CF7BB58C499B5BF13E67BF8245EE7A3BF9AA6FA89647F91CFF2CFA11" target="_blank" rel="noreferrer"><span>6B316076</span>…2CFA11</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">revoke-credential for a credentialed member -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/FCF104146E103F2ED87A7BBFE4DB2E411C90B4D54BC27381957032E8E0AC2A10" target="_blank" rel="noreferrer"><span>FCF10414</span>…AC2A10</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">re-issue credential to that member -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/38AEA4CEB1A8F94E16904407855BCC14737569EF28E6A5CF0B46A6D065220D2C" target="_blank" rel="noreferrer"><span>38AEA4CE</span>…220D2C</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">issue-credential missing subject -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">accept-credential by the member -&gt; settles</td>
+    <td class="out"><span class="verdict">200 tecDUPLICATE</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/10582383DA7B065F56C948AEB0F86CDBCDFD8D718AAB6067E16D96F9BD2D8930" target="_blank" rel="noreferrer"><span>10582383</span>…2D8930</a></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">J</span>
+      <h2>Permissioned deposit gating &amp; domain</h2>
+      <span class="grp-stat all">3/3</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">credentialed depositor deposits 250 -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/B64161E9835EEA1C57D3F275D63818979F43888AACEA7F4CB002F4D2ACF08936" target="_blank" rel="noreferrer"><span>B64161E9</span>…F08936</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">owner set-domain on permissioned vault -&gt; settles</td>
+    <td class="out"><span class="verdict">200 tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/7D297EF1FE56F1BE0A61DA17E7D95F729C3B9571F45E11CFFCB59F1A901C5EFB" target="_blank" rel="noreferrer"><span>7D297EF1</span>…1C5EFB</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">provision public: settled 15 on-ledger steps</td>
+    <td class="out"><span class="verdict">15 tx</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">K</span>
+      <h2>Public (non-permissioned) vault</h2>
+      <span class="grp-stat all">10/10</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">no credentialIssuer seat (public)</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">state credentials list empty (public)</td>
+    <td class="out"></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">set-domain on public vault -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">issue-credential on public vault -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">revoke-credential on public vault -&gt; 409</td>
+    <td class="out"><span class="verdict">HTTP 409</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">deposit on public vault (no gate) -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/6838C577A124EBB98F28C1CCA038260398107F485913033AB90718C09B388AF9" target="_blank" rel="noreferrer"><span>6838C577</span>…388AF9</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">withdraw on public vault -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/C1CB08AD30DAF239B7DE578EF61513575B8B999D76A0AA838203BB686167BFFA" target="_blank" rel="noreferrer"><span>C1CB08AD</span>…67BFFA</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate loan on public vault -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/DBF66E0CF2232FB622BEE04DC094853EA11C9616C944042F56991539D35BC50D" target="_blank" rel="noreferrer"><span>DBF66E0C</span>…5BC50D</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">repay loan on public vault -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/0D81F8A7C6F2728CD14D23DCA37A78A285396D046682A4AE483A585EC4984E2D" target="_blank" rel="noreferrer"><span>0D81F8A7</span>…984E2D</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">provision multi-participant: settled 24 on-ledger steps</td>
+    <td class="out"><span class="verdict">24 tx</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">L</span>
+      <h2>Runtime add-participant</h2>
+      <span class="grp-stat all">10/10</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add depositor #1 -&gt; 200 + grew (2-&gt;3)</td>
+    <td class="out"><span class="verdict">3</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add depositor #2 -&gt; 200 + grew (3-&gt;4)</td>
+    <td class="out"><span class="verdict">4</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add depositor #3 -&gt; 200 + grew (4-&gt;5)</td>
+    <td class="out"><span class="verdict">5</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add borrower -&gt; 200 + grew</td>
+    <td class="out"><span class="verdict">borrowers=3</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add bad role -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add missing role -&gt; 400</td>
+    <td class="out"><span class="verdict">HTTP 400</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">added depositor:4 can deposit -&gt; tesSUCCESS</td>
+    <td class="out"><span class="chip tes">tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/74A93C17EC25326C5E27F6090EF7944557B72D8A9B80A8DAAA7C439C12CEE9AA" target="_blank" rel="noreferrer"><span>74A93C17</span>…CEE9AA</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">depositor:4 funded on-ledger</td>
+    <td class="out"><span class="verdict">xrp=3.599997</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">originate loan to runtime-added borrower:2 -&gt; settles</td>
+    <td class="out"><span class="verdict">200 tesSUCCESS</span></td>
+    <td class="proof"><a class="hash" href="https://devnet.xrpl.org/transactions/0F1EA233ECE3D2D1D084312289716A406167992933432995AA36AB2ACF73C977" target="_blank" rel="noreferrer"><span>0F1EA233</span>…73C977</a></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">add-participant recorded in the action log</td>
+    <td class="out"><span class="verdict">system log entry</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section><section class="grp">
+    <header class="grp-h">
+      <span class="grp-code">M</span>
+      <h2>Bots driving the pool</h2>
+      <span class="grp-stat all">5/5</span>
+    </header>
+    <div class="tbl-wrap"><table class="tbl">
+      <colgroup><col class="c-state"><col class="c-name"><col class="c-out"><col class="c-proof"></colgroup>
+      <tbody><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots start (interval 2s) -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots start again (idempotent) -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots produced settled on-ledger actions</td>
+    <td class="out"><span class="verdict">1 new bot tx</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots stop -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr><tr class="ok">
+    <td class="state"><span class="glyph">✓</span></td>
+    <td class="name">bots stop again (no-op) -&gt; 200</td>
+    <td class="out"><span class="verdict">HTTP 200</span></td>
+    <td class="proof"><span class="muted">—</span></td>
+  </tr></tbody>
+    </table></div>
+  </section>
+
+  <details class="ledger">
+    <summary>On-ledger transaction proofs <span class="c">122 transactions · click any hash to verify on devnet.xrpl.org</span></summary>
+    <div class="tbl-wrap"><table class="ptbl">
+      <thead><tr><th>Scenario group</th><th>On-ledger action</th><th>Result</th><th>Transaction</th></tr></thead>
+      <tbody><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>issuer-allow-clawback</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/55AF14DA720E878B4C19CE374A2ADEFB5A939A81924B9D8BC82B256E10CD5E05" target="_blank" rel="noreferrer"><span>55AF14DA</span>…CD5E05</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>issuer-default-ripple</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/A23E780AE05D204D29B17ECA0ACBD12331BB650700EBF7D28CF0B547513C5F45" target="_blank" rel="noreferrer"><span>A23E780A</span>…3C5F45</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>trust-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/F479F36356FDAC6052DF3E9F4F114B82131D0C62B6F26C7996AAC4E1113F3C05" target="_blank" rel="noreferrer"><span>F479F363</span>…3F3C05</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>trust-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4CAF19E19BB122D0AF81509CB5700DB16D5F3504C35D32DCE4E9FE4D421C8E23" target="_blank" rel="noreferrer"><span>4CAF19E1</span>…1C8E23</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>trust-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/5D76F11903DE4163ECBFCAD1BE62AB8F9EF0B32E462DAA7F31FF5E3B1969174A" target="_blank" rel="noreferrer"><span>5D76F119</span>…69174A</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>trust-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/9419FBC8E4E97264F27C6AAEB52B612257B2A0E04F383585F45F0321F3E47F27" target="_blank" rel="noreferrer"><span>9419FBC8</span>…E47F27</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>trust-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/E79AE93DC47916F270121742603390506EF942B593BFB2A8F883E9B4DAA702C3" target="_blank" rel="noreferrer"><span>E79AE93D</span>…A702C3</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>distribute-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/19628C264AC9CE4F544B352A1B55EFE89F76A7246C9354BBC1BBE12A71602CA3" target="_blank" rel="noreferrer"><span>19628C26</span>…602CA3</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>distribute-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B85FAB8D2C3BDF61602F17F01990F18CC0B4E5CDC4780DBA22D950206F4AB4A9" target="_blank" rel="noreferrer"><span>B85FAB8D</span>…4AB4A9</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>distribute-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/D780D07A286C49486F45A7A8A51B276184D076865FB5F7E62BFBBA2F517F8661" target="_blank" rel="noreferrer"><span>D780D07A</span>…7F8661</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>distribute-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/ED6120463776E3DBE041DD933D7268514D4650A22746BE73EC2902060168BA59" target="_blank" rel="noreferrer"><span>ED612046</span>…68BA59</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>distribute-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/AE300C1ED285D93F4E1A6E77814D2CD692D0D161A10F49C74A783C25D48BBF30" target="_blank" rel="noreferrer"><span>AE300C1E</span>…8BBF30</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-create-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/623214DB5EFCE5F919BAE4B072F5BBE493A2C092CD2F447066D7413F64F7872C" target="_blank" rel="noreferrer"><span>623214DB</span>…F7872C</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-create-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/9C9BB2B352AE0F2A679F4441AF2CBD737FB4788EE8FD09E4E816068D7F47FE04" target="_blank" rel="noreferrer"><span>9C9BB2B3</span>…47FE04</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-create-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/33F95A7EE2AA68E60A8ED12A1B0455013E826F50CCBDA50C8C3342BC3558B945" target="_blank" rel="noreferrer"><span>33F95A7E</span>…58B945</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-create-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/3E62DAF964447520292AC4E77C0B24A7B785B3E9476876BD60B811BC2923E185" target="_blank" rel="noreferrer"><span>3E62DAF9</span>…23E185</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-accept-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/19870F090F972AC95309AC4B83D8C8490665241FE77AC6F1FD8ADA08E3D1E8CB" target="_blank" rel="noreferrer"><span>19870F09</span>…D1E8CB</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-accept-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/F049FBAE0B9010687E00659844D938595EC78AA6D81AF5D0C3F998E561830F6C" target="_blank" rel="noreferrer"><span>F049FBAE</span>…830F6C</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-accept-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/27AECC00DF6FF68A5CB05B4D078067B361439D6C3E27FA0588E42F85A796CF45" target="_blank" rel="noreferrer"><span>27AECC00</span>…96CF45</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>credential-accept-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/298A9FE658C73A6885EA6750F66A88EE99C1B3AAD989F6814A6E04491BD3942E" target="_blank" rel="noreferrer"><span>298A9FE6</span>…D3942E</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>domain-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B9C69D2EC706311196C98625984A046D705838FEB15D2CE6B388493CA5E8CC51" target="_blank" rel="noreferrer"><span>B9C69D2E</span>…E8CC51</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>vault-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/AB8563F63AD2F7158DE3651E8C4B9010F1D155CDD486DAAF2457A7C3488BDE0C" target="_blank" rel="noreferrer"><span>AB8563F6</span>…8BDE0C</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>broker-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2A4636EE7A09555ADD3348482E9C6AC8F1DB309695AD24E8FC233F6C2707A6AD" target="_blank" rel="noreferrer"><span>2A4636EE</span>…07A6AD</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (permissioned-IOU-core)</td>
+  <td class="p-act"><code>cover-deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0AA43EF906B92D9DF6694B7E51796551CE7C3742202F3F38AD98C6E851B4820B" target="_blank" rel="noreferrer"><span>0AA43EF9</span>…B4820B</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/EF6C3FFAEA03EEDB3116F2CA559F89908A3F0674D6BE52A6D38C73F1C8690827" target="_blank" rel="noreferrer"><span>EF6C3FFA</span>…690827</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B43030DAC6C30BE354251971F5447A99D18940B5EB8AAA0FDD6234DE73FDC71C" target="_blank" rel="noreferrer"><span>B43030DA</span>…FDC71C</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/1B4A1728A4FD0EBDB56E5D7BFC1E3E2A1A1F1EA5D26A6D07048C9CD5021ABC87" target="_blank" rel="noreferrer"><span>1B4A1728</span>…1ABC87</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>withdraw</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/5A8713105F179D5B4243C3DC5C4DE727FD2F5F1B3D90B6FFB5531E0B2F356800" target="_blank" rel="noreferrer"><span>5A871310</span>…356800</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>withdraw</code></td>
+  <td class="p-code"><span class="chip tec">tecINSUFFICIENT_FUNDS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/74A148EBAE04CF4381D93B5D86AE86740AB756DFEB0D7D1CEA2DD9E07FA4F091" target="_blank" rel="noreferrer"><span>74A148EB</span>…A4F091</a></td>
+</tr><tr>
+  <td class="p-grp">Depositor yield &amp; liquidity</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tec">tecINSUFFICIENT_FUNDS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/70EDC0C6EDCC421E70EC52F80BFD6997385A09D47178F8EDB62BB709C35CF720" target="_blank" rel="noreferrer"><span>70EDC0C6</span>…5CF720</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>deposit-cover</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/F0D56CEBC49AF63FDA79CA2164D57A734EDAB13856D5109766035FAA58D9809A" target="_blank" rel="noreferrer"><span>F0D56CEB</span>…D9809A</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>set-vault</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/87D4A93F61A11169B12A85B815742BFCA58C3EAF30C00CABBA0A316731B01F44" target="_blank" rel="noreferrer"><span>87D4A93F</span>…B01F44</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>deposit-cover</code></td>
+  <td class="p-code"><span class="chip tec">tecINSUFFICIENT_FUNDS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/BAEE954FA62DA90E5EDB746D7332B0C602E4335A7001E20F26A80D9D237845B0" target="_blank" rel="noreferrer"><span>BAEE954F</span>…7845B0</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>set-vault</code></td>
+  <td class="p-code"><span class="chip tec">tecLIMIT_EXCEEDED</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/1510577D5FC71131696441281989556E1B4ECE04CC69256707627342B545E0E7" target="_blank" rel="noreferrer"><span>1510577D</span>…45E0E7</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>set-vault</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2BBB22F6E373E15C7C458548ECDFF2677C45A2721A5873C977D83C0049B0638F" target="_blank" rel="noreferrer"><span>2BBB22F6</span>…B0638F</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tec">tecLIMIT_EXCEEDED</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/9BDF2A3C4A6AC5F24F9286056FCD39E99DAC81C8BF72A88F57A7B8733B3C5CF5" target="_blank" rel="noreferrer"><span>9BDF2A3C</span>…3C5CF5</a></td>
+</tr><tr>
+  <td class="p-grp">Owner: cover &amp; vault management</td>
+  <td class="p-act"><code>set-vault</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/53CE1092AB9E57C7AC13AC21E130D994B3161990191D5544D4067B72B75C88A0" target="_blank" rel="noreferrer"><span>53CE1092</span>…5C88A0</a></td>
+</tr><tr>
+  <td class="p-grp">Full loan lifecycle (originate -&gt; underpay tec -&gt; full repay -&gt; settled)</td>
+  <td class="p-act"><code>originate</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2B6B813725F05DD904902257884733510FBFC43ABED9448C798237BFE05F3D20" target="_blank" rel="noreferrer"><span>2B6B8137</span>…5F3D20</a></td>
+</tr><tr>
+  <td class="p-grp">Full loan lifecycle (originate -&gt; underpay tec -&gt; full repay -&gt; settled)</td>
+  <td class="p-act"><code>repay</code></td>
+  <td class="p-code"><span class="chip tec">tecINSUFFICIENT_PAYMENT</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/1BDB229483EA6B520C46576E0887A16A8E0E8EFAED40FBD4DEF5E467E2B93A30" target="_blank" rel="noreferrer"><span>1BDB2294</span>…B93A30</a></td>
+</tr><tr>
+  <td class="p-grp">Full loan lifecycle (originate -&gt; underpay tec -&gt; full repay -&gt; settled)</td>
+  <td class="p-act"><code>repay</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/210CE299C23CB3455E0E76542AB6CAAC6F91F6CC3FFA0B3B29B81726EF4658F8" target="_blank" rel="noreferrer"><span>210CE299</span>…4658F8</a></td>
+</tr><tr>
+  <td class="p-grp">Loan default path (originate -&gt; delinquency -&gt; owner default)</td>
+  <td class="p-act"><code>originate</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/AD6FA9C476ECB786DD080B852C7796F0045BE74938E4866206343AB14045DE9B" target="_blank" rel="noreferrer"><span>AD6FA9C4</span>…45DE9B</a></td>
+</tr><tr>
+  <td class="p-grp">Loan default path (originate -&gt; delinquency -&gt; owner default)</td>
+  <td class="p-act"><code>manage-loan</code></td>
+  <td class="p-code"><span class="chip tec">tecTOO_SOON</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/8D0F45064677D88D0768499F7D3778B22275CEFAC565B8704E5C91673A02F01A" target="_blank" rel="noreferrer"><span>8D0F4506</span>…02F01A</a></td>
+</tr><tr>
+  <td class="p-grp">Loan default path (originate -&gt; delinquency -&gt; owner default)</td>
+  <td class="p-act"><code>manage-loan</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/A70853CFC656E5677F76C0A65189D84EEBE7D2223BD75F85514ED8E5BB0C47AD" target="_blank" rel="noreferrer"><span>A70853CF</span>…0C47AD</a></td>
+</tr><tr>
+  <td class="p-grp">Loan &amp; action negatives</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/03AD9C4C70964748C9A742C8B569FEB265523F96CFC0C9503DE3E7E3F97E7950" target="_blank" rel="noreferrer"><span>03AD9C4C</span>…7E7950</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>issuer-allow-clawback</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2CBDF1CD3AF8E7FF2AC7D20395F936CA1AD0C04B62D0C130A1546009CF345BB0" target="_blank" rel="noreferrer"><span>2CBDF1CD</span>…345BB0</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>issuer-default-ripple</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4D6B8DD3BEC8E3A265CDA461DF6A3C857A96ABAA075B6E603CF7BDE58879B7C7" target="_blank" rel="noreferrer"><span>4D6B8DD3</span>…79B7C7</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>trust-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/14DF5D4AD307FA0CB3D70033848E2D93FF9029F49C78CDC6B3125EF7EDBAF280" target="_blank" rel="noreferrer"><span>14DF5D4A</span>…BAF280</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>trust-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/98FFEBA63C0AF2E00E66031E6942A731C6693B7D527BFB47DEB9FB2883CF32BE" target="_blank" rel="noreferrer"><span>98FFEBA6</span>…CF32BE</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>trust-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/ED31544A14DF42C4B95456F2AC23FAC62BD0B407F7937B10343FF6F4E2D106EF" target="_blank" rel="noreferrer"><span>ED31544A</span>…D106EF</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>trust-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/68A16A551DA30852452E16B1030F7F7F5E347407A530D9F9CB3A9B62834CB98D" target="_blank" rel="noreferrer"><span>68A16A55</span>…4CB98D</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>trust-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/D9F1F17490DD2124511A1AEF0D99937ABC114B96F8A871992E9AA67D50F0F616" target="_blank" rel="noreferrer"><span>D9F1F174</span>…F0F616</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>distribute-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/54EAE521E2A09A57631ACB481C3C696D3CAC0CCCA8655B67444773EB95F36ED1" target="_blank" rel="noreferrer"><span>54EAE521</span>…F36ED1</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>distribute-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/243121787037920A642426A1EDF4501B1E43E0BAA83908AF8C5F7F8CF49E5844" target="_blank" rel="noreferrer"><span>24312178</span>…9E5844</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>distribute-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/5534E8F528258CF9F617D00CC2872B6CC1F0A6DF724974F4D98A022852FBCDFE" target="_blank" rel="noreferrer"><span>5534E8F5</span>…FBCDFE</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>distribute-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/BB12025051702C1F056C67ED04122444AF17EDC7360CCC1647F41880D3BF307A" target="_blank" rel="noreferrer"><span>BB120250</span>…BF307A</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>distribute-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/CE0B4FE4643636E0C6DFE9A4C7835F2F7568E071BB33B8B283A16E73409347F5" target="_blank" rel="noreferrer"><span>CE0B4FE4</span>…9347F5</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-create-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4F4AB2DE40140BBFF86EE8A1CA786E878BD8BD8D740E362E3BEB73CC0A37D35B" target="_blank" rel="noreferrer"><span>4F4AB2DE</span>…37D35B</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-create-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/BFE76343D4EAC785CB4E057C17D41BA9377D9C88903CAF265C256B80CC256942" target="_blank" rel="noreferrer"><span>BFE76343</span>…256942</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-create-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/E90C154E95D3078E375F1F0604C94B8E8D6EF055711DE0F5E93824060D33A896" target="_blank" rel="noreferrer"><span>E90C154E</span>…33A896</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-create-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/8C5C59B716E1DCCE0EF5F4038F478D100B29AB41B47E91903F6354EAF7781F7B" target="_blank" rel="noreferrer"><span>8C5C59B7</span>…781F7B</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-accept-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/AE25BB32099C80267FB3C68BE08B9948A4A72F87F96B81A3F47D73FFA401AAB1" target="_blank" rel="noreferrer"><span>AE25BB32</span>…01AAB1</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-accept-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/D75288FE3AFB8AC3627211555F0E21C7A783395361B19933DF77C66F4537CFD6" target="_blank" rel="noreferrer"><span>D75288FE</span>…37CFD6</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-accept-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/C7428C413738E364EC5D027D43D4A64B64FC130D4088AB421D4C8D1C4F22C7A2" target="_blank" rel="noreferrer"><span>C7428C41</span>…22C7A2</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>credential-accept-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/24385BBD226A6F171917154B0B476F901F16DA0625882C459FA6A07F96FB2336" target="_blank" rel="noreferrer"><span>24385BBD</span>…FB2336</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>domain-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0A60503FAF5DCC6E4F9D444DA5A533CC8032FCECFF2863932EED5763E04D6F51" target="_blank" rel="noreferrer"><span>0A60503F</span>…4D6F51</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>vault-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4A01DC0BE5206F60DAE5B906E88E3A9396BBA5535DD14D16C0E5AA79B25D2A53" target="_blank" rel="noreferrer"><span>4A01DC0B</span>…5D2A53</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>broker-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/5C5A68B0BF4B4C0A257CD97F7066717CFCA1E91316A55639F3EC05EDDC003606" target="_blank" rel="noreferrer"><span>5C5A68B0</span>…003606</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (credentials)</td>
+  <td class="p-act"><code>cover-deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0C90663C99845D7D5CF0711346B2CC26BB8C52CA8064E8C99E9B4145AEFE545C" target="_blank" rel="noreferrer"><span>0C90663C</span>…FE545C</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>issue-credential</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/33EB42B71DF19622877B7D2FCA44A2852A77650063C81AC574BC27F0A57FA23A" target="_blank" rel="noreferrer"><span>33EB42B7</span>…7FA23A</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>issue-credential</code></td>
+  <td class="p-code"><span class="chip tec">tecNO_TARGET</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/568F259C1269955684D3A7DEAA52B2E85C900524E274BB7AC0D30A11C7F5F0C8" target="_blank" rel="noreferrer"><span>568F259C</span>…F5F0C8</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>revoke-credential</code></td>
+  <td class="p-code"><span class="chip tec">tecNO_ENTRY</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/6B316076CF7BB58C499B5BF13E67BF8245EE7A3BF9AA6FA89647F91CFF2CFA11" target="_blank" rel="noreferrer"><span>6B316076</span>…2CFA11</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>revoke-credential</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/FCF104146E103F2ED87A7BBFE4DB2E411C90B4D54BC27381957032E8E0AC2A10" target="_blank" rel="noreferrer"><span>FCF10414</span>…AC2A10</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>issue-credential</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/38AEA4CEB1A8F94E16904407855BCC14737569EF28E6A5CF0B46A6D065220D2C" target="_blank" rel="noreferrer"><span>38AEA4CE</span>…220D2C</a></td>
+</tr><tr>
+  <td class="p-grp">Credential handshake (issue / accept / revoke)</td>
+  <td class="p-act"><code>accept-credential</code></td>
+  <td class="p-code"><span class="chip tec">tecDUPLICATE</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/10582383DA7B065F56C948AEB0F86CDBCDFD8D718AAB6067E16D96F9BD2D8930" target="_blank" rel="noreferrer"><span>10582383</span>…2D8930</a></td>
+</tr><tr>
+  <td class="p-grp">Permissioned deposit gating &amp; domain</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B64161E9835EEA1C57D3F275D63818979F43888AACEA7F4CB002F4D2ACF08936" target="_blank" rel="noreferrer"><span>B64161E9</span>…F08936</a></td>
+</tr><tr>
+  <td class="p-grp">Permissioned deposit gating &amp; domain</td>
+  <td class="p-act"><code>set-domain</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/7D297EF1FE56F1BE0A61DA17E7D95F729C3B9571F45E11CFFCB59F1A901C5EFB" target="_blank" rel="noreferrer"><span>7D297EF1</span>…1C5EFB</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>issuer-allow-clawback</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/E4BD2752302053F6EFB1A85CFCEDF130B63099EEA51F40BC9C89C4EEAE1758D6" target="_blank" rel="noreferrer"><span>E4BD2752</span>…1758D6</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>issuer-default-ripple</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B735203A1E93FD8FBB3698D173470D66C1F2CAEBF5D6B49FF7BB288D3918F926" target="_blank" rel="noreferrer"><span>B735203A</span>…18F926</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>trust-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/9872D2C5520DDD970E6283041BFBEAA949E753182C241D18F0AF0B5C1C50C5BC" target="_blank" rel="noreferrer"><span>9872D2C5</span>…50C5BC</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>trust-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/8213D6E6E51C77E7CB097EC41E7EBE35F4DAC069F524326FF14B1352DB7DA2BF" target="_blank" rel="noreferrer"><span>8213D6E6</span>…7DA2BF</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>trust-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/09C386093ED3BBA551C5AF3DEE78AE18A713B8C3ED5E6B5D7A06B2A8B5538F3F" target="_blank" rel="noreferrer"><span>09C38609</span>…538F3F</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>trust-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/984156BF1724C85E94182BC55AE9C550EAF73E3899C5648B2DE8F84C74A48F8D" target="_blank" rel="noreferrer"><span>984156BF</span>…A48F8D</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>trust-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/12EC7FE19A27C101BDBB4A34111AEC784014F679ADBC457281D899EDB59A0ABE" target="_blank" rel="noreferrer"><span>12EC7FE1</span>…9A0ABE</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>distribute-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/34C80A40A424F57222DFAB5DE4D00064592DACF2AF9C329C2E711A6923A61C0F" target="_blank" rel="noreferrer"><span>34C80A40</span>…A61C0F</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>distribute-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4BD6AEBD833ADF38F49611242808E287C1D4BA7325A22FCF3F295065886D00FD" target="_blank" rel="noreferrer"><span>4BD6AEBD</span>…6D00FD</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>distribute-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/FFF092DEEB10E74A465412FA5E002D913ACCD9905C4FFF1C817D7FA93A2E28D5" target="_blank" rel="noreferrer"><span>FFF092DE</span>…2E28D5</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>distribute-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2BE2835A3917D31FECBD73B4AC8A79FCFF933996A7802F682AE687E44C6251EF" target="_blank" rel="noreferrer"><span>2BE2835A</span>…6251EF</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>distribute-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/6BA3818B94B05F6B594133C8AB4B16B4C66D3F7248CE594916983B9B81C040C5" target="_blank" rel="noreferrer"><span>6BA3818B</span>…C040C5</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>vault-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B1458246A0DDDD4CA6999598E3DE8A3AA0F69D551CAB16C310B99E671BEEAE87" target="_blank" rel="noreferrer"><span>B1458246</span>…EEAE87</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>broker-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/FDCF2B356EEA0BE09AE54F02CCEE71AA0F0AB8A86E45A0A87B5C3E3BF2F6D78F" target="_blank" rel="noreferrer"><span>FDCF2B35</span>…F6D78F</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (public)</td>
+  <td class="p-act"><code>cover-deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/876A40BA972268F9AC035E1E12882E60F8D687D21F41EDBE2E6686CE042A0158" target="_blank" rel="noreferrer"><span>876A40BA</span>…2A0158</a></td>
+</tr><tr>
+  <td class="p-grp">Public (non-permissioned) vault</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/6838C577A124EBB98F28C1CCA038260398107F485913033AB90718C09B388AF9" target="_blank" rel="noreferrer"><span>6838C577</span>…388AF9</a></td>
+</tr><tr>
+  <td class="p-grp">Public (non-permissioned) vault</td>
+  <td class="p-act"><code>withdraw</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/C1CB08AD30DAF239B7DE578EF61513575B8B999D76A0AA838203BB686167BFFA" target="_blank" rel="noreferrer"><span>C1CB08AD</span>…67BFFA</a></td>
+</tr><tr>
+  <td class="p-grp">Public (non-permissioned) vault</td>
+  <td class="p-act"><code>originate</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/DBF66E0CF2232FB622BEE04DC094853EA11C9616C944042F56991539D35BC50D" target="_blank" rel="noreferrer"><span>DBF66E0C</span>…5BC50D</a></td>
+</tr><tr>
+  <td class="p-grp">Public (non-permissioned) vault</td>
+  <td class="p-act"><code>repay</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0D81F8A7C6F2728CD14D23DCA37A78A285396D046682A4AE483A585EC4984E2D" target="_blank" rel="noreferrer"><span>0D81F8A7</span>…984E2D</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>issuer-allow-clawback</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/8742BD72A17D688AEC723C57F65C2953935AC1F1DBC5798D18DAA25D10A29A00" target="_blank" rel="noreferrer"><span>8742BD72</span>…A29A00</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>issuer-default-ripple</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/A0B7BCBA0B2CBC9629B93D58D0CA306F6F963377D83B4A202F06AA64D8D70625" target="_blank" rel="noreferrer"><span>A0B7BCBA</span>…D70625</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>trust-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B6DBCE98247F5B52343D57D6288E6A5C42CE114654A40822F6F4959ABF9D6432" target="_blank" rel="noreferrer"><span>B6DBCE98</span>…9D6432</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>trust-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/2F92A3A6435E1C4D25119F0AA19C1F405B4D69EB3C46A7EF370378B501856443" target="_blank" rel="noreferrer"><span>2F92A3A6</span>…856443</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>trust-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/4E708E88B632C876C84A83F8BF40181FCFCB3FE6F0EFE85624336A3A1B21BACF" target="_blank" rel="noreferrer"><span>4E708E88</span>…21BACF</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>trust-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/DA4E969EFF11EC48A4CAAF4F4A0CB127F0D35E181FB1B3A796559114FCB9652C" target="_blank" rel="noreferrer"><span>DA4E969E</span>…B9652C</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>trust-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/DA2F9CAE0F174C65559BBE5E494D32949BB37E53EF55487F96F6DFDDF85F02AC" target="_blank" rel="noreferrer"><span>DA2F9CAE</span>…5F02AC</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>distribute-owner</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/AE02175E8ABEF1FA744BEA2692F3573A174D702B6B6158CE06031F7A246F82F6" target="_blank" rel="noreferrer"><span>AE02175E</span>…6F82F6</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>distribute-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B63D78E17B54D9EB237ED2FA07261AE7CAB53E6B02AEB1E29EB2B094D33AA183" target="_blank" rel="noreferrer"><span>B63D78E1</span>…3AA183</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>distribute-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0042001388172FBB17157F737D58B45F1A884637293C4636242BEB5DE1B9A3EE" target="_blank" rel="noreferrer"><span>00420013</span>…B9A3EE</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>distribute-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/361A6338C6798DC92EC895EAEABE0EFE4C5D940732AC7AD6884EE62A3B61BAD2" target="_blank" rel="noreferrer"><span>361A6338</span>…61BAD2</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>distribute-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/B6B6B375F8501095FF9BFC76930B00F25A2F608D1483F10B670FCFD2E59CD647" target="_blank" rel="noreferrer"><span>B6B6B375</span>…9CD647</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-create-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/3FD24A889FB66A3FB705AAF5FCB123CCC421D24708302B45FC3FE8F15DCF884D" target="_blank" rel="noreferrer"><span>3FD24A88</span>…CF884D</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-create-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/1E18F5E050215FBB47CC9E9B840B9669E22D5952BA08104D845110957124C6EE" target="_blank" rel="noreferrer"><span>1E18F5E0</span>…24C6EE</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-create-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/7A730AF32B2ABEB5EB4A1B55D3642128069370FB5C3B0E3C94CED2EC6AD46517" target="_blank" rel="noreferrer"><span>7A730AF3</span>…D46517</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-create-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/A09388332C465ADCE6CE2EE36CA940E17D126D3C508E82D59D0FF01FBBB7DAC4" target="_blank" rel="noreferrer"><span>A0938833</span>…B7DAC4</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-accept-depositor[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/14730D742693DDD1B01B8634433BDE1ACFE8652B407CD5D544DBC9D0EFD3806E" target="_blank" rel="noreferrer"><span>14730D74</span>…D3806E</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-accept-depositor[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/98DA542AB76F95BC89B83888482D10F97E79D55ACB335DA837DAED77044AF593" target="_blank" rel="noreferrer"><span>98DA542A</span>…4AF593</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-accept-borrower[0]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/92DFB77FC63095FB76718C268D48CC18D15E99CA1948AD260A0D56A9B60476F8" target="_blank" rel="noreferrer"><span>92DFB77F</span>…0476F8</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>credential-accept-borrower[1]</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/6C41C0F0E197B0B09BB9EE54C4565AC0E186C4799F485B27CC39238CCD407E4D" target="_blank" rel="noreferrer"><span>6C41C0F0</span>…407E4D</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>domain-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/9FF9DF93A1E6899F1800005A3A82D569AAA781167A0D574BA274B81CBA2114FB" target="_blank" rel="noreferrer"><span>9FF9DF93</span>…2114FB</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>vault-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/F438FE7CAAC81DA9B563B6969A46DD3938EB45B965389B6B12F97A6B54A7984B" target="_blank" rel="noreferrer"><span>F438FE7C</span>…A7984B</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>broker-create</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/FD90C2E0759149455B731177023BF14461838B9C9387BEE7EEF0943D188A3785" target="_blank" rel="noreferrer"><span>FD90C2E0</span>…8A3785</a></td>
+</tr><tr>
+  <td class="p-grp">Provisioning (multi-participant)</td>
+  <td class="p-act"><code>cover-deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/07EA5508431A3E7F864D284331E3DD04E3470993A078AF0AAEC607A7BC1B1611" target="_blank" rel="noreferrer"><span>07EA5508</span>…1B1611</a></td>
+</tr><tr>
+  <td class="p-grp">Runtime add-participant</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/74A93C17EC25326C5E27F6090EF7944557B72D8A9B80A8DAAA7C439C12CEE9AA" target="_blank" rel="noreferrer"><span>74A93C17</span>…CEE9AA</a></td>
+</tr><tr>
+  <td class="p-grp">Runtime add-participant</td>
+  <td class="p-act"><code>originate</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/0F1EA233ECE3D2D1D084312289716A406167992933432995AA36AB2ACF73C977" target="_blank" rel="noreferrer"><span>0F1EA233</span>…73C977</a></td>
+</tr><tr>
+  <td class="p-grp">Bots driving the pool</td>
+  <td class="p-act"><code>deposit</code></td>
+  <td class="p-code"><span class="chip tes">tesSUCCESS</span></td>
+  <td class="p-hash"><a class="hash" href="https://devnet.xrpl.org/transactions/EA460AECCF6128A11F0D04A5AEA01447D7A8F54BE900ABE9A1C7F01F1AC2D597" target="_blank" rel="noreferrer"><span>EA460AEC</span>…C2D597</a></td>
+</tr></tbody>
+    </table></div>
+  </details>
+
+  <footer>
+    Executed against engine http://localhost:4000 on the XRP Ledger Devnet.<br>
+    Positive scenarios settle real transactions (linked above); negative scenarios assert the engine's validation, authorization, and ledger-rejection paths (<span style="color:var(--tec)">tec*</span> codes are expected, correct outcomes).<br>
+    Explorer · <a href="https://devnet.xrpl.org" target="_blank" rel="noreferrer">devnet.xrpl.org</a>
+  </footer>
+</div>
