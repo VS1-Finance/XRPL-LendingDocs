@@ -25,4 +25,6 @@ FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /build/.site /usr/share/nginx/html
 EXPOSE 80
-HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1
+# No container-level HEALTHCHECK: the platform's reverse proxy does its own health probing, and a
+# flaky in-container check can leave the container marked "unhealthy" so the proxy won't route to it
+# (surfacing as a 502 even though nginx is serving fine).
