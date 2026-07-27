@@ -27,13 +27,13 @@ npx retypeapp build     # static site → .retype/
 
 ## Run with Docker
 
-Build the static site first, then build and run the nginx image that serves it:
+The image builds the site from source (no host pre-build needed) and serves it from nginx:
 
 ```bash
-npx retypeapp build                            # renders docs/ → .retype/
 docker build -t xrpl-lending-docs .
 docker run --rm -p 8080:80 xrpl-lending-docs   # http://localhost:8080
 ```
 
-The image only serves the pre-built `.retype/` output — the retype toolchain is not shipped in the
-container — so the image stays small (~85 MB) and the build has no network dependency.
+A multi-stage build renders `docs/` in a Node stage, then copies the static output into a small nginx
+image. It builds from a plain git checkout, so any platform that builds from the repo (EasyPanel, CI)
+can deploy it directly — point it at this repo, and it exposes port 80.

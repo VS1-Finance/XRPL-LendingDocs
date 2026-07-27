@@ -1,10 +1,8 @@
 node_modules
+.retype
 retype.manifest
 .git
 .gitignore
-Dockerfile
 .dockerignore
-package.json
-docs
 .docsource
 README.md
