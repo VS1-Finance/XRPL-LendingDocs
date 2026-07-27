@@ -1,8 +1,10 @@
 node_modules
 .retype
+.site
 retype.manifest
 .git
 .gitignore
 .dockerignore
 .docsource
 README.md
+package.json

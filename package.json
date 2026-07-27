@@ -6,6 +6,6 @@
     "build": "retype build"
   },
   "devDependencies": {
-    "retypeapp": "^3"
+    "retypeapp": "4.6.0"
   }
 }

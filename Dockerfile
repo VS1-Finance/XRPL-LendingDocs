@@ -1,26 +1,28 @@
 # Build the Retype static site from source, then serve it from nginx.
 #
-# This builds entirely from the repo — no pre-built .retype/ is required — so it works on any
-# platform that builds from a git checkout (EasyPanel, CI, `docker build`).
-#
-# The build stage must be a glibc image (Debian slim), not Alpine/musl: retype ships a glibc-linked
-# .NET binary that cannot execute under musl. The serve stage stays on nginx-alpine.
+# Builds entirely from the repo — no pre-built output required — so any platform that builds from a
+# git checkout (EasyPanel, CI, `docker build`) can deploy it directly.
 #
 #   docker build -t xrpl-lending-docs .
 #   docker run --rm -p 8080:80 xrpl-lending-docs   # http://localhost:8080
 
 # --- Build stage: render docs/ into a static site ---
-FROM node:20-bookworm-slim AS build
-WORKDIR /docs
-COPY package.json ./
-RUN npm install
+# Use the .NET SDK image and install retype as a dotnet tool (Retype's official approach). Retype is a
+# .NET app, so building on the SDK image gives it the correct runtime — no manual libicu/glibc fixes,
+# no Node needed for the build.
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /build
+RUN dotnet tool install retypeapp --version 4.6.0 --tool-path /usr/local/bin
 COPY retype.yml ./
 COPY docs ./docs
-RUN npx retypeapp build
+# Build to an explicit output dir, then fail loudly if retype emitted nothing.
+RUN retype build --output .site \
+    && test -f .site/index.html \
+    || (echo "ERROR: retype build produced no .site/index.html" && ls -la .site 2>/dev/null; exit 1)
 
 # --- Serve stage: a tiny nginx image serving the built output ---
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /docs/.retype /usr/share/nginx/html
+COPY --from=build /build/.site /usr/share/nginx/html
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1
