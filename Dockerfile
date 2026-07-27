@@ -7,10 +7,10 @@
 #   docker run --rm -p 8080:80 xrpl-lending-docs   # http://localhost:8080
 
 # --- Build stage: render docs/ into a static site ---
-# Use the .NET SDK image and install retype as a dotnet tool (Retype's official approach). Retype is a
-# .NET app, so building on the SDK image gives it the correct runtime — no manual libicu/glibc fixes,
-# no Node needed for the build.
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# Install retype as a dotnet tool (Retype is a .NET app; the SDK image gives it the correct runtime —
+# no manual libicu/glibc fixes, no Node needed to build). Retype 4.6.0's tool targets net10.0, so the
+# SDK image MUST be 10.0 — an older SDK (e.g. 9.0) fails with "DotnetToolSettings.xml not found".
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /build
 RUN dotnet tool install retypeapp --version 4.6.0 --tool-path /usr/local/bin
 COPY retype.yml ./
