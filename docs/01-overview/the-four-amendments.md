@@ -1,18 +1,20 @@
 ---
-label: The Four Amendments
+label: The Amendments
 order: 90
 ---
 
-# The Four Amendments
+# The Amendments
 
-This system is built entirely from four XRPL amendments, chained so that each one's ledger object
-becomes the next one's input. Nothing in the chain is enforced by application code — access control,
-capital pooling, and loan origination are all native ledger objects and transactions, checked by
-consensus. This page is the plain-language on-ramp; each section links to the detailed, cited
+This system is built entirely from five XRPL amendments. Four are chained so that each one's ledger
+object becomes the next one's input — identity, gating, capital, and origination. A fifth, XLS-56
+Batch, is the atomicity layer: it guarantees that the cross-account steps setting all of that up
+commit together or not at all. Nothing here is enforced by application code — access control, capital
+pooling, loan origination, and atomic setup are all native ledger objects and transactions, checked
+by consensus. This page is the plain-language on-ramp; each section links to the detailed, cited
 protocol page for that amendment, and [Protocol Foundations](../02-protocol/index.md) documents the
 exact seams between them with source citations.
 
-## The four amendments, in plain language
+## The amendments, in plain language
 
 ### XLS-70 — Credentials: on-ledger identity
 
@@ -51,6 +53,17 @@ depositors do, and the broker's owner must be the same account as the vault's ow
 
 Detail: [XLS-66 — Lending Protocol](../02-protocol/xls66-lending-protocol.md).
 
+### XLS-56 — Batch: atomicity
+
+Setting up the market means composing objects across several accounts, and two of those steps are one
+unit of work spanning two accounts: a member's credential create + accept, and a holder's trust line +
+the issuer's distribution. XLS-56 Batch wraps each pair in a single all-or-nothing transaction, signed
+by both accounts, so either both halves apply or neither does — the market is never left
+half-provisioned by a failure between the two. It is the atomicity layer beneath the four above: it
+does not change *what* the market is, it guarantees *how* the market's cross-account setup commits.
+
+Detail: [XLS-56 — Batch](../02-protocol/xls56-batch.md).
+
 ## The chain
 
 Read top to bottom, each amendment's output becomes the next amendment's input: **on-ledger identity
@@ -73,17 +86,10 @@ flowchart LR
   its pooled assets, backed by cover capital the broker's owner supplies. The broker and the vault
   must share one owner.
 
-For the full seam-by-seam mechanics — exact fields, transaction order, and the negative-suite proof
-that the gate holds at the protocol boundary — see [Protocol Foundations](../02-protocol/index.md).
-
-## A note on XLS-56 — Batch
-
-These four amendments *are* the product. A fifth, **XLS-56 — Batch**, appears only in how the
-environment is stood up: where two setup steps across different accounts must succeed together — a
-member's credential create + accept, or a holder's trust line + the issuer's distribution — they are
-submitted as one all-or-nothing `Batch` transaction rather than separately. It changes nothing about
-what the market *is*; it makes provisioning atomic where atomicity matters. See
-[Transaction Batching](../03-architecture/transaction-batching.md#6-native-xls-56-batch--atomic-cross-account-pairs).
+The four chained amendments define *what* the market is; XLS-56 Batch, sitting beneath them, guarantees
+*how* its cross-account setup commits — atomically. For the full seam-by-seam mechanics — exact fields,
+transaction order, and the negative-suite proof that the gate holds at the protocol boundary — see
+[Protocol Foundations](../02-protocol/index.md).
 
 ## Read next
 
@@ -92,3 +98,4 @@ what the market *is*; it makes provisioning atomic where atomicity matters. See
 - [XLS-80 — Permissioned Domains](../02-protocol/xls80-permissioned-domains.md)
 - [XLS-65 — Single Asset Vault](../02-protocol/xls65-single-asset-vault.md)
 - [XLS-66 — Lending Protocol](../02-protocol/xls66-lending-protocol.md)
+- [XLS-56 — Batch](../02-protocol/xls56-batch.md)

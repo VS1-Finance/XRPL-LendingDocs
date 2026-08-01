@@ -4,11 +4,12 @@ order: 100
 icon: stack
 ---
 
-# How the Four Amendments Compose
+# How the Amendments Compose
 
-The platform's thesis: **on-ledger identity gates a vault that funds a lending market.** Four XRPL
-amendments are chained so that each one's output is the next one's input — access policy is enforced
-by consensus, not by application code sitting in front of it.
+The platform's thesis: **on-ledger identity gates a vault that funds a lending market.** Five XRPL
+amendments make it work — four chained so that each one's output is the next one's input, and a fifth
+that guarantees the cross-account setup commits atomically. Access policy is enforced by consensus, not
+by application code sitting in front of it.
 
 - **XLS-70 Credentials** — identity: an issuer attests a typed credential to a subject.
 - **XLS-80 Permissioned Domains** — enforcement: a domain lists which credential issuer/type pairs it
@@ -17,6 +18,9 @@ by consensus, not by application code sitting in front of it.
   domain members when the domain is attached.
 - **XLS-66 Lending Protocol** — origination: a loan broker attached to the vault originates loans
   against the pooled liquidity, backed by first-loss cover.
+- **XLS-56 Batch** — atomicity: the cross-account setup steps (a member's credential handshake, a
+  holder's trust line + distribution) each commit as one all-or-nothing transaction, so the market is
+  never left half-provisioned. See [XLS-56 Batch](./xls56-batch.md).
 
 Each amendment is documented in full on its own page (linked at the end). This page documents only
 the seams — the concrete points where one amendment's object or field becomes another's input — each
@@ -248,3 +252,4 @@ per-account lookup runs at all (`state-service.ts:80`), because there is no doma
 - [XLS-66 — Lending Protocol](./xls66-lending-protocol.md)
 - [XLS-70 — Credentials](./xls70-credentials.md)
 - [XLS-80 — Permissioned Domains](./xls80-permissioned-domains.md)
+- [XLS-56 — Batch](./xls56-batch.md)

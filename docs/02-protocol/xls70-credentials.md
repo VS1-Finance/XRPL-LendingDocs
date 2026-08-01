@@ -175,4 +175,4 @@ vault has no domain and therefore no gate to fail.
 - [Result Codes](../07-reference/result-codes.md) — `tecNO_AUTH` and the full ledger/HTTP code reference.
 - [Transaction Map](../07-reference/transaction-map.md) — every transaction this system submits, by amendment.
 - [Permissioned Domains (XLS-80)](./xls80-permissioned-domains.md) — how `AcceptedCredentials` consumes what this page issues.
-- [How the Four Amendments Compose](./index.md) — the full credential → domain → vault → lending chain.
+- [How the Amendments Compose](./index.md) — the full credential → domain → vault → lending chain.
