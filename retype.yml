@@ -1,6 +1,6 @@
 input: docs
 output: .retype
-url: https://vs1-finance.github.io/lending-docs
+url: https://xrpl-lending-docs.blockcraft.pl
 
 branding:
   logo: static/logo.svg
