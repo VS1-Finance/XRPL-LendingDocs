@@ -7,10 +7,10 @@ icon: home
 # XRPL Permissioned Lending
 
 A reference implementation of permissioned, credential-gated lending on the XRP Ledger. It composes
-four ledger amendments into one working platform, provisioned and exercised end to end on the XRPL
+five ledger amendments into one working platform, provisioned and exercised end to end on the XRPL
 Devnet.
 
-> **On-ledger identity gates a vault that funds a lending market.**
+> **On-ledger identity gates a vault that funds a lending market — stood up atomically.**
 
 Four amendments chain so that each one's output is the next one's input:
 
@@ -18,6 +18,10 @@ Four amendments chain so that each one's output is the next one's input:
 - **XLS-80 Permissioned Domains** — a domain admits holders of specific credentials. A membership gate.
 - **XLS-65 Single Asset Vault** — depositors supply an asset and receive shares (MPTokens). Pooled capital.
 - **XLS-66 Lending Protocol** — a broker on the vault originates loans, backed by first-loss cover.
+
+A fifth amendment holds it all together:
+
+- **XLS-56 Batch** — cross-account setup steps commit as one all-or-nothing transaction. The atomicity layer.
 
 The [Protocol Foundations](./02-protocol/index.md) section documents each amendment as this system uses
 it, with citations to the code and the XLS specifications.
@@ -39,8 +43,8 @@ enforced by the ledger, not by application logic. See
 
 | Section | What it covers |
 |---|---|
-| [Overview](./01-overview/index.md) | What this is, the four amendments in plain language, the system at a glance. |
-| [Protocol Foundations](./02-protocol/index.md) | The four XLS amendments, how they compose, and the ledger objects. |
+| [Overview](./01-overview/index.md) | What this is, the amendments in plain language, the system at a glance. |
+| [Protocol Foundations](./02-protocol/index.md) | The five XLS amendments, how they compose, and the ledger objects. |
 | [Architecture](./03-architecture/index.md) | Provisioning, per-ledger batching, sessions and seats, persistence. |
 | [Engine API](./04-api/index.md) | The HTTP API — sessions, seats, the action vocabulary, reads. |
 | [Guides](./05-guides/index.md) | Quickstart, configuration, deployment, a full loan walkthrough, the CLIs. |

@@ -67,4 +67,4 @@ Neither stores private keys — accounts are re-derived from a seed and a per-se
 - [Provisioning Sequence](./provisioning-sequence.md) — the exact on-ledger object-creation order.
 - [Per-Ledger Transaction Batching](./transaction-batching.md) — how many transactions reach one ledger.
 - [The Session & Seat Model](./session-seat-model.md) — seats, occupancy, and the signer seam.
-- [How the Four Amendments Compose](../02-protocol/index.md) — the protocol foundations.
+- [How the Amendments Compose](../02-protocol/index.md) — the protocol foundations.
