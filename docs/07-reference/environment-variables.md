@@ -31,6 +31,7 @@ docker-compose's `${...}` shell interpolation. No variable below is invented —
 | `LOG_LEVEL` | Fastify logger level | `info` | No | `app.ts:17` |
 | `ENGINE_DATABASE_URL` | Postgres connection string for the engine's own operational store (sessions, seat occupancy, action log). **Secret** (embeds DB credentials). | — none | **Yes — fail-fast** | `store.ts:37-39` |
 | `BOT_MAX_ROUNDS` | Caps how many scheduler rounds a session's bot pool runs before stopping on its own | `20` | No | `bot-service.ts:50` |
+| `XRP_TREASURY_SEED` | Seed of a pre-funded internal treasury wallet that funds XRP vaults directly, instead of the public faucet. **Secret.** When set, XRP-vault provisioning draws reserves and liquidity from this wallet; it is **not** auto-refilled, so provisioning fails fast with a "top up `XRP_TREASURY_SEED`" error if the balance can't cover a pool. Unset falls back to the faucet, so a fresh clone needs no configuration. IOU vaults are unaffected (their liquidity is minted). | falls back to the public faucet | No | `funding.ts` (`resolveTreasury`) |
 
 `ENGINE_DATABASE_URL` is the one hard-required variable in the system: `EngineStore`'s constructor
 throws immediately if it is unset, before the store ever attempts a connection —
