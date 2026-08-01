@@ -76,6 +76,15 @@ flowchart LR
 For the full seam-by-seam mechanics — exact fields, transaction order, and the negative-suite proof
 that the gate holds at the protocol boundary — see [Protocol Foundations](../02-protocol/index.md).
 
+## A note on XLS-56 — Batch
+
+These four amendments *are* the product. A fifth, **XLS-56 — Batch**, appears only in how the
+environment is stood up: where two setup steps across different accounts must succeed together — a
+member's credential create + accept, or a holder's trust line + the issuer's distribution — they are
+submitted as one all-or-nothing `Batch` transaction rather than separately. It changes nothing about
+what the market *is*; it makes provisioning atomic where atomicity matters. See
+[Transaction Batching](../03-architecture/transaction-batching.md#6-native-xls-56-batch--atomic-cross-account-pairs).
+
 ## Read next
 
 - [Protocol Foundations](../02-protocol/index.md) — the composition chain in full detail, cited to source.

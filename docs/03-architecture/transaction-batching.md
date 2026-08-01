@@ -5,6 +5,13 @@ order: 60
 
 # Per-Ledger Transaction Batching
 
+Provisioning uses two complementary batching mechanisms:
+
+- **`submitBatch`** — a *soft* batcher (sections 1–5). It co-locates many transactions from the same account into one ledger by managing sequence numbers locally. Each transaction remains an independent on-ledger transaction; nothing is atomic across them. This is the workhorse for same-account fan-out (funding) and for the independent single-account steps (issuer flags, vault, broker, cover).
+- **`submitNativeBatch`** — a *hard*, atomic batcher (section 6) built on the **XLS-56 Batch** amendment. It wraps a small set of transactions from *different* accounts into one `Batch` transaction that applies all-or-nothing. It is used only where cross-account steps must succeed together: the credential handshake and the trust+distribute pair.
+
+Sections 1–5 describe the soft batcher; section 6 describes the native XLS-56 batcher and how provisioning routes each pair to it.
+
 ## 1. The problem
 
 XRPL's baseline submission pattern — autofill, sign, `submitAndWait`, repeat — blocks on ledger close for every transaction. Provisioning a session means dozens of independent transactions (issuer flags, trust lines, distributions, credentials, domain, vault, broker, cover) across several distinct signing accounts. Submitted one at a time, that is dozens of ledger-close waits stacked serially — the dominant cost of provisioning is wall-clock time spent waiting, not transaction count.
@@ -172,10 +179,52 @@ flowchart TD
 
 | Caller | Purpose | Source |
 |---|---|---|
-| `runBatch` | Provisioning fan-out: batches every independent step group (issuer flags, trust lines, distributions, credential create/accept, domain, vault, broker, cover) after filtering out steps already on-ledger. | `packages/bootstrap/src/steps.ts:52-78`, calling `submitBatch` at `steps.ts:69` |
+| `runBatch` | Provisioning fan-out for **independent, single-account** step groups: issuer flags, and the strictly-sequential vault → broker → cover chain, after filtering out steps already on-ledger. The credential and trust+distribute pairs are no longer submitted here — they go through `runCrossAccountBatches` (section 6). | `packages/bootstrap/src/steps.ts:52-78`, calling `submitBatch` at `steps.ts:69` |
 | `fanOutFunding` | Funding fan-out: batches the treasury `Payment`s to every account still short of its target balance, wrapped in `withRetry` for network-level transience. | `packages/shared/src/funding.ts:27-64`, calling `submitBatch` at `funding.ts:54` |
-| `addParticipant` | Runtime add-participant: seats a new depositor/borrower into a running session, batching that member's trust+distribute or credential create+accept steps through the same `runBatch` path. | `packages/session/src/add-participant.ts:92-97` (calls `runBatch`, which calls `submitBatch`) |
+| `addParticipant` | Runtime add-participant: seats a new depositor/borrower into a running session, batching that member's steps through the `runBatch` path. (This path still uses the soft batcher — it is signed at runtime and not yet migrated to the atomic native Batch.) | `packages/session/src/add-participant.ts:92-97` (calls `runBatch`, which calls `submitBatch`) |
 
-All three share one property: the caller already knows every transaction it needs before submitting any of them, which is exactly the shape `submitBatch` is built for — a known, finite set of transactions across a known set of accounts, submitted for the minimum number of ledger closes.
+These share one property: the caller already knows every transaction it needs before submitting any of them, which is exactly the shape `submitBatch` is built for — a known, finite set of transactions across a known set of accounts, submitted for the minimum number of ledger closes.
+
+## 6. Native XLS-56 Batch — atomic cross-account pairs
+
+The soft batcher gets many of one account's transactions into a ledger, but each is still independent: if a member's `CredentialCreate` lands and its `CredentialAccept` fails, the member is left half-provisioned. Two provisioning steps are genuinely *one unit of work across two accounts*:
+
+- **The credential handshake** — `CredentialCreate` (signed by the credential issuer) + `CredentialAccept` (signed by the holder). The accept depends on the create.
+- **Trust + distribute** — `TrustSet` (signed by the holder) + the issuer's distribution `Payment`. The distribution depends on the trust line existing.
+
+Each pair is submitted as a single **XLS-56 `Batch`** transaction with the `tfAllOrNothing` flag, so either both inner transactions apply or neither does — no half-provisioned state, and the create→accept / trust→distribute ordering hazard disappears.
+
+### submitNativeBatch
+
+`submitNativeBatch(client, inners)` (`packages/shared/src/client.ts:213`) builds one `Batch` from 2–8 inner transactions, each with its signing wallet (`BatchInner`, `client.ts:198`):
+
+1. **Mark each inner.** Every inner transaction gets the `tfInnerBatchTxn` flag (`0x40000000`, `client.ts:211,227`) and its memo tags. It does **not** set `Sequence`, `Fee`, or `SigningPubKey` — `client.autofill` fills those for the batch and rejects non-conforming presets, and inner transactions must carry `Fee: "0"` and an empty `SigningPubKey`.
+2. **Build the outer.** One `Batch` with `Flags: BatchFlags.tfAllOrNothing` and the inners under `RawTransactions`. `autofill` computes inner sequences and the outer fee.
+3. **Sign per account.** `autofill`'s outer fee counts the base and inner fees but not the `BatchSigners`, so one base fee is added per distinct account **minus the submitter** — `accounts.size - 1`, because `combineBatchSigners` drops the submitter's own `BatchSigner` (the submitter signs the outer directly). Omitting this returns `telINSUF_FEE_P`.
+4. **Combine and submit.** Each distinct account signs a *separate copy* of the batch via `signMultiBatch` (which overwrites `BatchSigners` in place, so a copy per account is required), the copies are merged with `combineBatchSigners`, the submitting account signs the outer, and it is submitted with `submitAndWait`.
+
+The outer result is classified with the same `classifyResult` buckets as the soft batcher: a `fatal` result throws (naming the correlation IDs), and a transient one — including `telINSUF_FEE_P`, treated as retryable so a fee spike self-heals — retries with fresh sequences up to four attempts.
+
+### runCrossAccountBatches
+
+`runCrossAccountBatches(deps, units)` (`packages/bootstrap/src/steps.ts:96`) is the provisioning-side driver. A `BatchUnit` (`steps.ts:82`) bundles one holder's paired inners plus an `alreadyDone`/`verify` pair of on-ledger checks. The driver:
+
+1. Runs each unit's `alreadyDone()` and **skips** units already satisfied on-ledger — recording their inners as `skipped` with the same `StepRecord`/`onStep`/log bookkeeping as `runBatch`, so re-runs are idempotent.
+2. **Chunks** the remaining units so no `Batch` exceeds 8 inner transactions (`steps.ts:122`) — four two-inner pairs per batch — and submits each chunk via `submitNativeBatch`.
+3. After a chunk's outer validates, calls each unit's `verify()` as the on-ledger source of truth, records every verified unit's `StepRecord`, and only then throws if any unit failed to verify — so a spurious verification failure never erases the audit trail of pairs that actually landed (`steps.ts:144`).
+
+Idempotency keys off the ledger, not a flag: credentials skip on `hasAcceptedCredential`; trust+distribute skips when the holder already holds at least the target issued balance (which implies the trust line exists).
+
+### Where the pairs are wired
+
+| Pair | Builder | Provisioning call |
+|---|---|---|
+| Credential create + accept (permissioned vaults) | `credentialHandshakeUnits` (`steps.ts:254`) | `provision.ts:104`, gated by `if (config.domain)` |
+| Trust + distribute (IOU vaults, incl. owner) | `trustAndDistributeUnits` (`steps.ts:211`) | `provision.ts:98`, gated by `if (!isXrpAsset(config.asset))` |
+
+A public vault has no credentials and a native-XRP vault has no trust/distribute, so those paths run no cross-account batches at all — the native batcher is engaged only where an atomic cross-account pair actually exists. The strictly-sequential vault → broker → cover chain is **not** batched: each step needs a ledger-object ID produced by the previous one, which an inner batch transaction cannot reference.
+
+> [!NOTE]
+> XLS-56 Batch requires the `BatchV1_1` amendment (active on Devnet) and an `xrpl` client that implements its signing preimage. See [Environment Variables](../07-reference/environment-variables.md) and [Running the Engine](../05-guides/running-the-engine.md) for the client version this pins.
 
 See [Provisioning Sequence](./provisioning-sequence.md) for how these batched step groups compose into the full provisioning order, and [Result Codes](../07-reference/result-codes.md) for the on-ledger code catalog referenced above.
