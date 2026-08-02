@@ -1,3 +1,5 @@
 node_modules/
 .retype/
 retype.manifest
+.docsource/
+.env*

@@ -5,9 +5,8 @@ order: 30
 
 # Environment Variables
 
-Every environment variable actually read by the codebase, grouped by component. Derived from
-`grep -rn "process.env" packages/*/src --include="*.ts"` across the monorepo
-(`/Users/levan/Documents/projects/xrpl/lending-reference`) plus the two places a `DATABASE_URL` is
+Every environment variable actually read by the codebase, grouped by component. This covers every
+`process.env` read across the monorepo's `packages/*/src`, plus the two places a `DATABASE_URL` is
 consumed outside a direct `process.env` call: Prisma's `env()` datasource directive and
 docker-compose's `${...}` shell interpolation. No variable below is invented — each has a
 `file:line` citation to a real read.
