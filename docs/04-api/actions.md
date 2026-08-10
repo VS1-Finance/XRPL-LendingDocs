@@ -100,8 +100,8 @@ All 11 are handled in `buildTransaction`'s switch (`action-service.ts:76-182`), 
 | `set-domain` | owner | `issuer`?, `credentialType`? | PermissionedDomainSet | action-service.ts:141-158 |
 | `manage-loan` | owner | `loanId` | LoanManage (`Flags: tfLoanDefault` = 65536) | action-service.ts:162-168 |
 | `deposit-cover` | owner | `amount` | LoanBrokerCoverDeposit | action-service.ts:172-178 |
-| `originate` | owner (+ borrower counter-signs) | `borrower`, `principal`, `interestRate`?, `interval`?, `grace`? | LoanSet | action-service.ts:188-232 |
-| `request-loan` | borrower (owner counter-signs, resolved by the engine) | `principal`, `interval`? | LoanSet | action-service.ts (`requestLoan`) |
+| `originate` | owner (+ borrower counter-signs) | `borrower`, `principal`, `interestRate`?, `interval`?, `grace`?, `paymentTotal`? | LoanSet | action-service.ts:188-232 |
+| `request-loan` | borrower (owner counter-signs, resolved by the engine) | `principal`, `interval`?, `paymentTotal`? | LoanSet | action-service.ts (`requestLoan`) |
 
 `?` marks a param with a session-derived default (credential type, credential issuer) rather than a hard requirement — see `resolveCredentialType`/`resolveCredentialIssuer` below. A missing hard-required param throws `ActionError("missing parameter ${key}")` at default status **400** (`required`, `action-service.ts:293-296`; `ActionError`'s default `status = 400`, `action-service.ts:19`). An unrecognized `action` string falls through the switch's `default` and throws a plain **400** (`action-service.ts:181`, no explicit status given).
 
@@ -179,9 +179,12 @@ const loanSet = {
   InterestRate: Number(params.interestRate ?? 50000),
   PaymentInterval: Number(params.interval ?? 60),
   GracePeriod: Number(params.grace ?? 60),
+  ...(term !== undefined ? { PaymentTotal: term } : {}),
   LoanOriginationFee: "0",
 };
 ```
+
+`term` is `paymentTotal(params.paymentTotal)` — the optional term length (the number of scheduled payments). It is a plain count, not an asset amount, so it never runs through `brokerValue`; a bad value (non-integer or ≤ 0) is a clean `HTTP 400` (`invalid term`) rather than a malformed transaction, and omitting it leaves the schedule for the ledger to derive. `InterestRate` is a scaled integer (`100000` = 100%); the web form collects a human percent and multiplies by `1000` before sending.
 
 The owner and borrower wallets are re-derived from the session seed by role and seat index (`deriveAccount(session.seed, "owner", owner.index)` / `deriveAccount(session.seed, "borrower", borrowerSeat.index)`, `:219-220`) — the derived addresses match the seats' on-ledger accounts, which is what binds each raw signature to the correct identity. The transaction is autofilled, signed by the owner wallet, counter-signed by the borrower wallet via `signLoanSetByCounterparty`, and submitted with `submitAndWait` (`:221-225`). The result `code` is read from the transaction metadata's `TransactionResult` (`:226-228`), the same ledger-result contract as every other action.
 

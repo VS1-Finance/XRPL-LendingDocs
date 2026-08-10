@@ -17,7 +17,7 @@ Related: [Result Codes](../07-reference/result-codes.md), [Transaction Map](../0
 | `LoanBrokerCoverDeposit` | Add first-loss cover capital to the broker. | `LoanBrokerID`, `Amount` | `steps.ts:224-249` (provisioning seed), `action-service.ts:172-178` (owner action `deposit-cover`) |
 | `LoanBrokerCoverWithdraw` | Withdraw cover capital. | `LoanBrokerID`, `Amount` | Not an exposed action verb — exercised only by negative-suite N13 (`negative-suite/src/cases/lending.ts:154-171`), asserting `tecINSUFFICIENT_FUNDS` when a withdrawal would drop cover below the floor backing outstanding debt. |
 | `LoanBrokerDelete` | Tear down the broker. | `LoanBrokerID` | `teardown.ts:41` |
-| `LoanSet` | Originate a loan. Bilateral — see [§2](#2-bilateral-origination). | `LoanBrokerID`, `Counterparty`, `PrincipalRequested`, `InterestRate`, `PaymentInterval`, `GracePeriod`, `LoanOriginationFee` | `action-service.ts:188-232` |
+| `LoanSet` | Originate a loan. Bilateral — see [§2](#2-bilateral-origination). | `LoanBrokerID`, `Counterparty`, `PrincipalRequested`, `InterestRate`, `PaymentInterval`, `GracePeriod`, `PaymentTotal` (optional), `LoanOriginationFee` | `action-service.ts:188-232` |
 | `LoanPay` | Repay against an outstanding loan. | `LoanID`, `Amount` | `action-service.ts:93-101` |
 | `LoanManage` | Manage loan status; the only flag we set is the default flag. | `LoanID`, `Flags: tfLoanDefault (65536)` | `action-service.ts:162-168` |
 | `LoanDelete` | Delete a closed loan. | `LoanID` | Not an exposed action verb — exercised only by negative-suite N15 (`negative-suite/src/cases/lending.ts:195-210`), asserting `tecHAS_OBLIGATIONS` against an active loan. |
@@ -44,6 +44,7 @@ The `originate` handler (`action-service.ts:188-232`):
      InterestRate: Number(params.interestRate ?? 50000),
      PaymentInterval: Number(params.interval ?? 60),
      GracePeriod: Number(params.grace ?? 60),
+     ...(term !== undefined ? { PaymentTotal: term } : {}),
      LoanOriginationFee: "0",
    };
    ```
@@ -61,6 +62,7 @@ This is the only place in the engine where a transaction needs two raw signature
 | `InterestRate` | Scaled-integer rate; defaults to `50000` (see [§4](#4-cover-rate-math-scaled-integers)). | Request param or default |
 | `PaymentInterval` | Seconds between scheduled payments; defaults to `60`. | Request param or default — see [§6](#6-paymentinterval--graceperiod--note-on-the-60-second-floor) |
 | `GracePeriod` | Seconds after the due date before the loan becomes defaultable; defaults to `60`. | Request param or default — see [§6](#6-paymentinterval--graceperiod--note-on-the-60-second-floor) |
+| `PaymentTotal` | Term length: the total number of payments scheduled against the loan (`UInt32`, a plain count — never asset-scaled). **Optional**; omit to let the ledger derive the payment schedule. When supplied, the resulting Loan's `PaymentRemaining` equals it. | Request param `paymentTotal`, included only when set (validated positive integer, else `HTTP 400`) |
 | `LoanOriginationFee` | Always `"0"` in this system — no origination fee is charged. | Hardcoded |
 
 `packages/negative-suite` case N10 confirms the bilateral requirement from the other direction: a `LoanSet` signed only by the owner (no counter-signature) is malformed and rejected before consensus (`negative-suite/src/cases/lending.ts:84-103`).
