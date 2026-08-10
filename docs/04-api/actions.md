@@ -101,6 +101,7 @@ All 11 are handled in `buildTransaction`'s switch (`action-service.ts:76-182`), 
 | `manage-loan` | owner | `loanId` | LoanManage (`Flags: tfLoanDefault` = 65536) | action-service.ts:162-168 |
 | `deposit-cover` | owner | `amount` | LoanBrokerCoverDeposit | action-service.ts:172-178 |
 | `originate` | owner (+ borrower counter-signs) | `borrower`, `principal`, `interestRate`?, `interval`?, `grace`? | LoanSet | action-service.ts:188-232 |
+| `request-loan` | borrower (owner counter-signs, resolved by the engine) | `principal`, `interval`? | LoanSet | action-service.ts (`requestLoan`) |
 
 `?` marks a param with a session-derived default (credential type, credential issuer) rather than a hard requirement — see `resolveCredentialType`/`resolveCredentialIssuer` below. A missing hard-required param throws `ActionError("missing parameter ${key}")` at default status **400** (`required`, `action-service.ts:293-296`; `ActionError`'s default `status = 400`, `action-service.ts:19`). An unrecognized `action` string falls through the switch's `default` and throws a plain **400** (`action-service.ts:181`, no explicit status given).
 
@@ -193,6 +194,22 @@ The owner and borrower wallets are re-derived from the session seed by role and 
 > The published XLS-66 spec text defines `PaymentInterval` and `GracePeriod` as plain `UINT32` seconds fields and **does not document a minimum value** for either. What we can state as fact is only what we observed: submitting `originate` with `PaymentInterval: "30"` (below 60) was rejected with **`temINVALID`** before it ever reached a ledger — `HTTP 400`, detail `"LoanSet: PaymentInterval must be greater than or equal to 60"` (`e2e-data.json`, scenario "originate interval < 60 -> 400"); `60`/`60` succeeds. Treat "≥ 60s" as this system's demonstrated behavior on Devnet — most likely a rippled preflight/implementation constraint (possibly from rippled PR #5270) rather than a rule published in the XLS-66 README. Do not assert it as a protocol minimum. See [Result Codes — tem](../07-reference/result-codes.md#tem--malformed-never-reaches-consensus) for the same finding with its full citation, and [XLS-66](../02-protocol/xls66-lending-protocol.md) for the field definitions.
 
 Because a `temINVALID` never reaches a ledger, it is not a `code` in the action response at all — `asClientError` maps the preliminary `tem` rejection straight to **HTTP 400** (`action-service.ts:39-44`).
+
+## request-loan — borrower-initiated, same bilateral LoanSet
+
+`originate` is signed *by the owner*: the loan originator picks a borrower seat and a principal, and the borrower's wallet counter-signs. `request-loan` is the same `LoanSet`, driven from the *other* side — a human sitting in a **borrower** seat asks for the loan, and the engine resolves the owner and signs the owner-first half on their behalf. Both verbs produce one `LoanSet` with `Account` = the broker owner and `Counterparty` = the borrower; the only difference is which side initiates.
+
+The engine handles `request-loan` in `requestLoan` (`action-service.ts`), dispatched from `routes/actions.ts` alongside `originate` rather than through `dispatchAction`. Its guards, in order:
+
+- **Borrower seat must exist** — unknown seat → **404** (`session has no seat …`).
+- **Borrower seat must be held by the caller** — bot-driven, unheld, or held by someone else → **409** (`… is not held by …`).
+- **Seat must be a borrower seat** — any other role → **409** (`only a borrower seat can request a loan`).
+- **Session must have an owner seat** — no owner to counter-sign → **404** (`session has no owner seat`).
+- **One loan per borrower** — an `account_objects` query for existing `loan` entries on the borrower; non-empty → **409** (`borrower already has an active loan`).
+
+Params are `principal` (required) and `interval` (optional, seconds). `interestRate` and `grace` are not caller-supplied here — the engine applies the same defaults as `originate` (`InterestRate` 50000, `GracePeriod` 60), and `interval` is still subject to the observed **≥ 60s** floor documented above (below 60 → `temINVALID` → **HTTP 400**). The principal is bounded by vault liquidity and first-loss cover; over the cap the ledger returns `tecLIMIT_EXCEEDED`.
+
+Signing mirrors `originate` exactly but with the initiating side flipped: the engine re-derives both the owner wallet (`deriveAccount(session.seed, "owner", owner.index)`) and the borrower wallet (`deriveAccount(session.seed, "borrower", borrowerSeat.index)`), autofills and signs the `LoanSet` with the owner wallet first, counter-signs with the borrower wallet via `signLoanSetByCounterparty`, and submits with `submitAndWait`. The result `code` is read from the transaction metadata's `TransactionResult`, the same contract as `originate`.
 
 ## Public-vault gating (409)
 
