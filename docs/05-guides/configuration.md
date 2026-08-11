@@ -51,6 +51,10 @@ shipped at `packages/bootstrap/config.example.json`.
 | `bots.depositorWeights.hold` | `number` | `1` | non-negative | `schema.ts:99` |
 | `bots.depositorWeights.churn` | `number` | `0` | non-negative | `schema.ts:100` |
 | `bots.depositorWeights.topUp` | `number` | `0` | non-negative | `schema.ts:101` |
+| `loanDefaults.interestRate` | `number` (scaled rate) | omitted (engine default 50000) | non-negative integer ≤ 100000 (`100000` = 100%) | `schema.ts:112-118` |
+| `loanDefaults.paymentInterval` | `number` (seconds) | omitted (engine default 60) | integer ≥ 60 | `schema.ts:112-118` |
+| `loanDefaults.gracePeriod` | `number` (seconds) | omitted (engine default 60) | integer ≥ 0, ≤ `loanDefaults.paymentInterval` | `schema.ts:112-118` |
+| `loanDefaults.paymentTotal` | `number` (count) | omitted (ledger-derived) | positive integer | `schema.ts:112-118` |
 
 `bots` itself defaults to `{}` (`schema.ts:105`), and its two weight objects each default to `{}`
 (`schema.ts:96,103`) — a config can omit `bots` entirely and still get the defaults above at every
@@ -303,6 +307,16 @@ without it uses built-in defaults at every level (`schema.ts:82-83`).
 
 Weights are relative and need not sum to one (`schema.ts:83-84`). See
 [Bot Framework](../03-architecture/bot-framework.md) for what each named variant actually does.
+
+## loanDefaults
+
+The optional `loanDefaults` block sets the default terms a loan takes at origination — interest rate, payment interval, grace period, and term length (`schema.ts:112-118`). It is the **lowest-precedence** source: a value supplied per origination wins, then a value supplied when a session is created, then this config block, then the engine's built-in fallback. In other words:
+
+```
+per-origination param  >  per-session create input  >  config loanDefaults  >  engine fallback (50000 / 60 / 60 / ledger-derived)
+```
+
+`interestRate` is the ledger's scaled integer (`100000` = 100%), consistent with the other scaled rates in this file — not a percentage. `paymentInterval` and `gracePeriod` are seconds (interval ≥ 60, grace ≤ interval); `paymentTotal` is a payment count, and omitting it leaves the schedule for the ledger to derive. Omit the whole block to keep the engine's built-in defaults, which is the behaviour when no loan terms are supplied anywhere. A block with an incoherent pair (grace above interval) is rejected at config load, before any provisioning.
 
 ## .strict() and unknown keys
 

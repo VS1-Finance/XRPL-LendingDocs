@@ -27,6 +27,14 @@ interface ProvisionBody {
   coverAmount?: string;
   debtMaximum?: string;
   scenario?: string;
+  botSeed?: string;
+  // Session-level default loan terms. interestRatePercent is a human percent; interval/grace seconds;
+  // paymentTotal a payment count. Each overrides the config-file `loanDefaults` and is overridden by a
+  // per-origination value.
+  interestRatePercent?: number;
+  paymentInterval?: number;
+  gracePeriod?: number;
+  paymentTotal?: number;
   // Whether the vault is permissioned (domain-gated, default) or public (open). false → public.
   permissioned?: boolean;
 }
@@ -45,6 +53,10 @@ Every field is optional; anything omitted falls back to the engine's base `Confi
 | `coverAmount`, `debtMaximum` | `string?` | Whole-unit decimal strings, passed straight through onto the config (`session-service.ts:99-100`). |
 | `coverRatePercent`, `liquidationRatePercent`, `managementFeePercent` | `number?` | Percentages, converted to the ledger's scaled-integer rate (`percent * 1000`, rounded, floored at 0) via `pctToScaled` (`session-service.ts:27-29,101-103`) onto `coverRateMinimum` / `coverRateLiquidation` / `managementFeeRate`. |
 | `scenario` | `string?` | One of `calm` / `mixed` / `defaults` (`weights.ts:24-46`, cited in `.docsource/code-map.md`) — biases bot-variant weighting when the bot scheduler starts for this session (`bot-service.ts:41-42`). Stored per-session (`session-service.ts:50,108`), not validated against the enum at the route. |
+| `botSeed` | `string?` | Fixes the bot variant assignment so a run's behaviour mix is reproducible; omitted → the engine generates a `seed-<hex>` value. A non-string is rejected `400` before provisioning. Echoed on the summary as `botSeed`. |
+| `interestRatePercent` | `number?` | Session default interest rate as a human percent (0–100); the engine scales it to the ledger integer (`×1000`). Applied at origination when neither a per-origination value nor — below it — the config-file `loanDefaults` supplies one. |
+| `paymentInterval`, `gracePeriod` | `number?` | Session default payment interval / grace period, in seconds (interval ≥ 60, grace ≤ interval). Same precedence as `interestRatePercent`. |
+| `paymentTotal` | `number?` | Session default term length (payment count, positive integer); omitted leaves the schedule ledger-derived. |
 
 > [!NOTE]
 > `ProvisionBody` has no `network` or `seed` field — every session derives its seed from the engine's
