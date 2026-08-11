@@ -79,12 +79,24 @@ Each round (`scheduler.ts:53-90`):
 6. If the same non-success result repeats `GIVE_UP_AFTER = 3` times in a row for a seat, that seat is added to `exhausted` and skipped for the rest of the run — so a seat stuck against a wall (e.g. a depositor hitting a full vault) does not keep burning rounds and ledger submissions (`scheduler.ts:39,73-76`).
 7. A `tick` that throws is caught and logged; it does not stop the scheduler (`scheduler.ts:79-81`).
 
-The round stops the scheduler when `maxRounds` is reached, or when every bot-driven seat with an assigned variant has become exhausted (`scheduler.ts:84-88`, `allExhausted` at `:95-104`). Otherwise it sleeps `intervalSeconds` (default 15) before the next round (`scheduler.ts:14,43,89`).
+The round stops the scheduler when `maxRounds` is reached, or when every bot-driven seat with an assigned variant has become exhausted (`scheduler.ts:84-88`, `allExhausted` at `:95-104`). Otherwise it paces the next round on **ledger progression** — `waitForLedgerAdvance` waits until the validated ledger has advanced at least one ledger (`intervalSeconds` bounds the wait so a stalled network cannot wedge the pool), rather than sleeping a fixed wall-clock interval. Pacing on the ledger, not the host clock, is what lets two runs with the same seed observe ledger state at the same logical points — the basis of deterministic behavior (below).
 
 Variant assignment is resolved once at `run()` start: an explicit `assignment` if given, otherwise `assignAutomatically(session, options.variants)` (`scheduler.ts:44`).
 
 > [!NOTE]
 > The engine's default `maxRounds` for a started bot run is governed by `BOT_MAX_ROUNDS` (default 20) — see `bot-service.ts:50` per the engine API.
+
+## Determinism
+
+Bot behavior is deterministic. Three properties combine to guarantee that, for the same conditions, a bot always takes the same action:
+
+1. **Seed-fixed strategy.** The seed fixes which variant each seat runs, drawn once at `run()` start from a seeded stream (`seededStream(weights.seed, "variant-assignment")`). The same seed and pool produce the same seat→variant map every run.
+2. **Pure decisions.** Every variant's per-tick decision is a pure function of the observed ledger state — the loan/vault/broker objects it reads and the ledger's own `close_time`. There is no `Math.random`, no host-clock read, and no dependence on ledger height in any decision; amounts are `Math.min(fixedValue, floor(headroom))`, a pure function of read state. Given the same observed state, a variant computes the same action.
+3. **Ledger-paced sampling.** Rounds advance on ledger progression (`waitForLedgerAdvance`), not the wall clock, and seats are visited in a fixed order (by role, then numeric index). So two runs with the same seed sample ledger state at the same logical points and act in the same order.
+
+Together: **the same seed, against equivalent starting state, produces the same bot behavior** — the same strategy per seat and the same sequence of actions. This is verifiable directly: two sessions provisioned with the same `botSeed`, scenario, and pool produce matching per-seat action sequences.
+
+What is *not* identical across two separate runs is account identity: each run provisions fresh accounts, so the wallet addresses, and therefore the transaction hashes and a loan's absolute due-date timestamps, differ. That is a property of running against a live network with fresh provisioning, not bot nondeterminism — the *behavior* (which seat does what, in what order) reproduces.
 
 ## See also
 
