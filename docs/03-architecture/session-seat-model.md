@@ -29,6 +29,10 @@ export interface Session {
 > [!NOTE]
 > A session's seat set is fixed at the roles present when `buildSeats` runs. Growing the depositor/borrower pool at runtime is a separate path (`add-participant.ts`) — see the note on account derivation's ["Runtime participant growth"](./account-derivation.md) and the [Participants API](../04-api/participants.md).
 
+### The five participant roles and the seats behind them
+
+The product presents five participant roles — **credential issuer, depositor, vault manager, loan originator, borrower** — but the seat set above has an `owner` seat rather than separate *vault manager* and *loan originator* seats. This is a protocol constraint, not a simplification: XLS-66 requires the loan broker to be owned by the same account that owns the vault, so the account that configures the vault (vault manager) and the account that originates loans from it (loan originator) **must be one and the same**. The system enforces this on-ledger and checks it at provision time — see the [single-owner invariant](../02-protocol/composition-and-invariants.md#1-single-owner-invariant) (`invariants-and-guards.md` has the runtime guard). So the `owner` seat backs both role surfaces: a human who takes it plays vault manager and loan originator together, exactly as the ledger requires. The remaining three roles map one-to-one to seats — `credentialIssuer`, `depositor`, `borrower` — and the `issuer` seat holds the currency for an IOU vault (an XRP vault has no currency issuer, so that role is not surfaced).
+
 ## Seat and Occupant
 
 A seat is one role slot bound to a single on-chain account (`seat.ts:14-20`):
