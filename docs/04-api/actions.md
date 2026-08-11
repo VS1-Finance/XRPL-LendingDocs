@@ -186,6 +186,19 @@ const loanSet = {
 
 `term` is `paymentTotal(params.paymentTotal)` — the optional term length (the number of scheduled payments). It is a plain count, not an asset amount, so it never runs through `brokerValue`; a bad value (non-integer or ≤ 0) is a clean `HTTP 400` (`invalid term`) rather than a malformed transaction, and omitting it leaves the schedule for the ledger to derive. `InterestRate` is a scaled integer (`100000` = 100%); the web form collects a human percent and multiplies by `1000` before sending.
 
+### Session-level default loan terms
+
+Loan terms are configurable at two levels. Each of `interestRate`, `interval`, `grace`, and `paymentTotal` can be supplied **per origination** (above), and any of them can also be set as a **session default** at provision time on the create-session body:
+
+| Create-session field | Applies to | Units |
+|---|---|---|
+| `interestRatePercent` | default interest rate | human percent (0–100); the engine scales it to the ledger's `100000 = 100%` integer |
+| `paymentInterval` | default payment interval | seconds (≥ 60) |
+| `gracePeriod` | default grace period | seconds (≤ the interval) |
+| `paymentTotal` | default term length | payment count (positive integer) |
+
+Precedence at origination is **per-origination value > session default > engine fallback** (`InterestRate 50000`, `PaymentInterval 60`, `GracePeriod 60`, term ledger-derived): a blank origination field inherits the session default, and a session with no default inherits the hardcoded fallback. A malformed session default (rate out of range, interval below 60, grace above the interval, non-positive term) is rejected as an `HTTP 400` **before** any environment is provisioned. The effective defaults are echoed on the session summary (`loanDefaults`) so a client can display and verify them.
+
 The owner and borrower wallets are re-derived from the session seed by role and seat index (`deriveAccount(session.seed, "owner", owner.index)` / `deriveAccount(session.seed, "borrower", borrowerSeat.index)`, `:219-220`) — the derived addresses match the seats' on-ledger accounts, which is what binds each raw signature to the correct identity. The transaction is autofilled, signed by the owner wallet, counter-signed by the borrower wallet via `signLoanSetByCounterparty`, and submitted with `submitAndWait` (`:221-225`). The result `code` is read from the transaction metadata's `TransactionResult` (`:226-228`), the same ledger-result contract as every other action.
 
 > [!NOTE]
